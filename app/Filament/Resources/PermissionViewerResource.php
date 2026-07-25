@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use Spatie\Permission\Models\Permission;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Tables\Table;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\ViewAction;
+use Filament\Resources\Pages\ListRecords;
+use Filament\Resources\Pages\ViewRecord;
+
+class PermissionViewerResource extends Resource
+{
+    protected static ?string $model = Permission::class;
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-key';
+    protected static string|\UnitEnum|null $navigationGroup = 'User Management';
+
+    public static function form(Schema $schema): Schema
+    {
+        // No forms needed for read‑only resource
+        return $schema;
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('name')->searchable()->sortable(),
+                TextColumn::make('guard_name')->searchable()->sortable(),
+                TextColumn::make('roles_count')
+                    ->label('Roles')
+                    ->getStateUsing(fn (Permission $record) => $record->roles->count()),
+            ])
+            ->actions([
+                ViewAction::make(),
+            ])
+            ->bulkActions([]);
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => \App\Filament\Resources\PermissionViewerResource\Pages\ListPermissions::route('/'),
+            'view' => \App\Filament\Resources\PermissionViewerResource\Pages\ViewPermission::route('/{record}'),
+        ];
+    }
+}
