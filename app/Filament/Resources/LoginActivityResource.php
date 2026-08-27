@@ -47,6 +47,47 @@ class LoginActivityResource extends Resource
             ->bulkActions([]);
     }
 
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->schema([
+            \Filament\Schemas\Components\Section::make('Detail Log Login')
+                ->icon('heroicon-o-arrow-right-on-rectangle')
+                ->schema([
+                    \Filament\Infolists\Components\TextEntry::make('user.name')
+                        ->label('Pengguna')
+                        ->default('Guest / Unknown')
+                        ->badge()
+                        ->color('primary'),
+
+                    \Filament\Infolists\Components\TextEntry::make('status')
+                        ->label('Status Login')
+                        ->badge()
+                        ->color(fn (string $state): string => match ($state) {
+                            'successful' => 'success',
+                            'locked'     => 'warning',
+                            default      => 'danger',
+                        }),
+
+                    \Filament\Infolists\Components\TextEntry::make('ip_address')
+                        ->label('IP Address'),
+
+                    \Filament\Infolists\Components\TextEntry::make('login_at')
+                        ->label('Waktu Login')
+                        ->dateTime('d M Y H:i:s'),
+
+                    \Filament\Infolists\Components\TextEntry::make('logout_at')
+                        ->label('Waktu Logout')
+                        ->dateTime('d M Y H:i:s')
+                        ->placeholder('Belum Logout / Sesi Aktif'),
+
+                    \Filament\Infolists\Components\TextEntry::make('user_agent')
+                        ->label('User Agent / Browser')
+                        ->columnSpan(3)
+                        ->placeholder('—'),
+                ])->columns(4),
+        ]);
+    }
+
     public static function getPages(): array
     {
         return [

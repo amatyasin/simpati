@@ -113,6 +113,7 @@ class ActivityLogResource extends Resource
     {
         return $schema->schema([
             InfolistSection::make('Informasi Utama Log')
+                ->icon('heroicon-o-clipboard-document-list')
                 ->schema([
                     TextEntry::make('log_name')
                         ->label('Kategori Log')
@@ -129,14 +130,15 @@ class ActivityLogResource extends Resource
                             default   => 'gray',
                         }),
 
-                    TextEntry::make('description')
-                        ->label('Deskripsi Kejadian'),
-
                     TextEntry::make('causer.name')
                         ->label('Pelaku Tindakan')
                         ->default('Sistem / Otomatis')
                         ->badge()
                         ->color('gray'),
+
+                    TextEntry::make('created_at')
+                        ->label('Waktu Kejadian')
+                        ->dateTime('d M Y H:i:s'),
 
                     TextEntry::make('subject_type')
                         ->label('Tipe Objek')
@@ -146,10 +148,10 @@ class ActivityLogResource extends Resource
                         ->label('ID Objek')
                         ->default('—'),
 
-                    TextEntry::make('created_at')
-                        ->label('Waktu')
-                        ->dateTime('d M Y H:i:s'),
-                ])->columns(3),
+                    TextEntry::make('description')
+                        ->label('Deskripsi Kejadian')
+                        ->columnSpan(2),
+                ])->columns(4),
 
             InfolistSection::make('Detail Perubahan Data (Properties)')
                 ->schema([

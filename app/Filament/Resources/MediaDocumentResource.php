@@ -78,6 +78,8 @@ class MediaDocumentResource extends Resource
                 ->icon('heroicon-o-document')
                 ->schema([
                     Select::make('media_id')
+                        ->id('doc_media_id')
+                        ->extraInputAttributes(['id' => 'doc_media_id'])
                         ->label('Mitra Media')
                         ->relationship('mediaPartner', 'brand_name')
                         ->searchable()
@@ -88,6 +90,8 @@ class MediaDocumentResource extends Resource
                         ->dehydrated(),
 
                     Select::make('document_type_id')
+                        ->id('doc_type_id')
+                        ->extraInputAttributes(['id' => 'doc_type_id'])
                         ->label('Tipe Dokumen')
                         ->relationship('documentType', 'name', fn ($query) => $query->where('is_active', true))
                         ->searchable()
@@ -105,23 +109,29 @@ class MediaDocumentResource extends Resource
                         ),
 
                     TextInput::make('document_number')
+                        ->id('doc_number')
+                        ->extraInputAttributes(['id' => 'doc_number'])
                         ->label('Nomor Dokumen')
                         ->required()
                         ->maxLength(255),
 
                     DatePicker::make('issue_date')
+                        ->id('doc_issue_date')
                         ->label('Tanggal Terbit')
                         ->native(false)
                         ->required()
                         ->maxDate(now()),
 
                     DatePicker::make('expiration_date')
+                        ->id('doc_expiration_date')
                         ->label('Tanggal Kedaluwarsa')
                         ->native(false)
                         ->minDate(fn ($get) => $get('issue_date'))
                         ->helperText('Kosongkan jika dokumen tidak memiliki masa kedaluwarsa.'),
 
                     SpatieMediaLibraryFileUpload::make('document_file')
+                        ->id('doc_file')
+                        ->extraInputAttributes(['id' => 'doc_file'])
                         ->label('File Dokumen')
                         ->collection('documents')
                         ->required(fn ($record) => $record === null)
@@ -308,6 +318,7 @@ class MediaDocumentResource extends Resource
     {
         return $schema->schema([
             Section::make('Detail Dokumen Administratif')
+                ->icon('heroicon-o-document-text')
                 ->schema([
                     TextEntry::make('mediaPartner.brand_name')
                         ->label('Mitra Media')
@@ -320,16 +331,6 @@ class MediaDocumentResource extends Resource
 
                     TextEntry::make('document_number')
                         ->label('Nomor Dokumen'),
-
-                    TextEntry::make('issue_date')
-                        ->label('Tanggal Terbit')
-                        ->date('d M Y')
-                        ->placeholder('—'),
-
-                    TextEntry::make('expiration_date')
-                        ->label('Tanggal Kedaluwarsa')
-                        ->date('d M Y')
-                        ->placeholder('Seumur Hidup'),
 
                     TextEntry::make('verification_status')
                         ->label('Status Verifikasi')
@@ -347,6 +348,16 @@ class MediaDocumentResource extends Resource
                             DocumentVerificationStatus::REJECTED => 'Ditolak',
                         }),
 
+                    TextEntry::make('issue_date')
+                        ->label('Tanggal Terbit')
+                        ->date('d M Y')
+                        ->placeholder('—'),
+
+                    TextEntry::make('expiration_date')
+                        ->label('Tanggal Kedaluwarsa')
+                        ->date('d M Y')
+                        ->placeholder('Seumur Hidup'),
+
                     TextEntry::make('verifier.name')
                         ->label('Verifikator')
                         ->placeholder('—'),
@@ -359,8 +370,8 @@ class MediaDocumentResource extends Resource
                     TextEntry::make('verification_notes')
                         ->label('Catatan Verifikator')
                         ->columnSpanFull()
-                        ->placeholder('—'),
-                ])->columns(3),
+                        ->placeholder('Tidak ada catatan verifikasi.'),
+                ])->columns(4),
         ]);
     }
 

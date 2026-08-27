@@ -52,6 +52,11 @@ class Media extends Model implements HasMedia
         $this->addMediaCollection('logos')
             ->singleFile()
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml']);
+
+        $this->addMediaCollection('merged_documents')
+            ->useDisk('public')
+            ->singleFile()
+            ->acceptsMimeTypes(['application/pdf']);
     }
 
     // -------------------------------------------------------------------------
@@ -185,5 +190,37 @@ class Media extends Model implements HasMedia
             ->whereNotNull('expiration_date')
             ->where('expiration_date', '<', now()->startOfDay())
             ->exists();
+    }
+
+    /**
+     * Get URL of generated merged PDF document.
+     */
+    public function getMergedPdfUrlAttribute(): ?string
+    {
+        return $this->getFirstMediaUrl('merged_documents') ?: null;
+    }
+
+    /**
+     * Get absolute local path of generated merged PDF document.
+     */
+    public function getMergedPdfPathAttribute(): ?string
+    {
+        return $this->getFirstMediaPath('merged_documents') ?: null;
+    }
+
+    /**
+     * Get count of uploaded available documents for this media profile.
+     */
+    public function getAvailableDocumentsCountAttribute(): int
+    {
+        return $this->mediaDocuments()->count();
+    }
+
+    /**
+     * Get total count of required active document types in the system.
+     */
+    public function getTotalRequiredDocumentsCountAttribute(): int
+    {
+        return DocumentType::where('is_active', true)->where('is_required', true)->count();
     }
 }

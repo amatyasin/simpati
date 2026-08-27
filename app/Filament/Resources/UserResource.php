@@ -38,52 +38,97 @@ class UserResource extends Resource
     {
         return $schema
             ->schema([
-                FileUpload::make('avatar')
-                    ->label('Avatar')
-                    ->image()
-                    ->directory('avatars')
-                    ->disk('public')
-                    ->maxSize(2048),
-                TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('email')
-                    ->email()
-                    ->unique(User::class, 'email', ignoreRecord: true)
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('phone')
-                    ->required()
-                    ->regex('/^[0-9]{10,15}$/')
-                    ->maxLength(15),
-                Select::make('status')
-                    ->options([
-                        UserStatus::Pending->value => 'Pending',
-                        UserStatus::Active->value => 'Active',
-                        UserStatus::Inactive->value => 'Inactive',
-                        UserStatus::Locked->value => 'Locked',
-                    ])
-                    ->required(),
-                Select::make('roles')
-                    ->relationship('roles', 'name')
-                    ->multiple()
-                    ->preload()
-                    ->required(),
-                DateTimePicker::make('last_login_at')
-                    ->label('Last Login At')
-                    ->disabled()
-                    ->format('Y-m-d H:i:s'),
-                TextInput::make('last_login_ip')
-                    ->label('Last Login IP')
-                    ->disabled(),
-                Toggle::make('is_active')
-                    ->label('Active')
-                    ->default(true),
-                TextInput::make('password')
-                    ->password()
-                    ->required(fn (string $operation): bool => $operation === 'create')
-                    ->minLength(8)
-                    ->maxLength(255),
+                \Filament\Schemas\Components\Section::make('Informasi Pengguna')
+                    ->icon('heroicon-o-user')
+                    ->description('Detail profil dan kredensial pengguna sistem.')
+                    ->schema([
+                        FileUpload::make('avatar')
+                            ->id('user_avatar')
+                            ->extraInputAttributes(['id' => 'user_avatar'])
+                            ->label('Foto / Avatar')
+                            ->image()
+                            ->directory('avatars')
+                            ->disk('public')
+                            ->maxSize(2048)
+                            ->columnSpanFull(),
+
+                        TextInput::make('name')
+                            ->id('user_name')
+                            ->extraInputAttributes(['id' => 'user_name'])
+                            ->label('Nama Lengkap')
+                            ->placeholder('Contoh: Budi Santoso')
+                            ->required()
+                            ->maxLength(255),
+
+                        TextInput::make('email')
+                            ->id('user_email')
+                            ->extraInputAttributes(['id' => 'user_email'])
+                            ->label('Email')
+                            ->placeholder('user@simpati.id')
+                            ->email()
+                            ->unique(User::class, 'email', ignoreRecord: true)
+                            ->required()
+                            ->maxLength(255),
+
+                        TextInput::make('password')
+                            ->id('user_password')
+                            ->extraInputAttributes(['id' => 'user_password'])
+                            ->label('Password')
+                            ->password()
+                            ->required(fn (string $operation): bool => $operation === 'create')
+                            ->minLength(8)
+                            ->maxLength(255),
+
+                        TextInput::make('phone')
+                            ->id('user_phone')
+                            ->extraInputAttributes(['id' => 'user_phone'])
+                            ->label('Nomor Telepon')
+                            ->placeholder('0812...')
+                            ->maxLength(15),
+
+                        Select::make('roles')
+                            ->id('user_roles')
+                            ->extraInputAttributes(['id' => 'user_roles'])
+                            ->label('Peran / Role')
+                            ->relationship('roles', 'name')
+                            ->multiple()
+                            ->preload()
+                            ->required(),
+
+                        Select::make('status')
+                            ->id('user_status')
+                            ->extraInputAttributes(['id' => 'user_status'])
+                            ->label('Status Akun')
+                            ->options([
+                                UserStatus::Pending->value => 'Pending',
+                                UserStatus::Active->value => 'Active',
+                                UserStatus::Inactive->value => 'Inactive',
+                                UserStatus::Locked->value => 'Locked',
+                            ])
+                            ->required(),
+                    ])->columns(2),
+
+                \Filament\Schemas\Components\Section::make('Aktivitas Login & System')
+                    ->icon('heroicon-o-clock')
+                    ->schema([
+                        DateTimePicker::make('last_login_at')
+                            ->id('last_login_at')
+                            ->label('Terakhir Login')
+                            ->disabled()
+                            ->format('Y-m-d H:i:s'),
+
+                        TextInput::make('last_login_ip')
+                            ->id('last_login_ip')
+                            ->extraInputAttributes(['id' => 'last_login_ip'])
+                            ->label('IP Terakhir Login')
+                            ->disabled(),
+
+                        Toggle::make('is_active')
+                            ->id('user_is_active')
+                            ->label('Akun Aktif')
+                            ->default(true)
+                            ->columnSpanFull(),
+                    ])->columns(2),
             ]);
     }
 
@@ -123,6 +168,7 @@ class UserResource extends Resource
                     ->relationship('roles', 'name'),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
@@ -130,6 +176,61 @@ class UserResource extends Resource
                 DeleteBulkAction::make(),
                 ForceDeleteBulkAction::make(),
             ]);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->schema([
+            \Filament\Schemas\Components\Section::make('Informasi Detail Pengguna')
+                ->icon('heroicon-o-user')
+                ->schema([
+                    \Filament\Infolists\Components\ImageEntry::make('avatar')
+                        ->label('Foto / Avatar')
+                        ->circular(),
+
+                    \Filament\Infolists\Components\TextEntry::make('name')
+                        ->label('Nama Lengkap')
+                        ->weight('bold'),
+
+                    \Filament\Infolists\Components\TextEntry::make('email')
+                        ->label('Email'),
+
+                    \Filament\Infolists\Components\TextEntry::make('phone')
+                        ->label('Nomor Telepon')
+                        ->placeholder('—'),
+
+                    \Filament\Infolists\Components\TextEntry::make('roles.name')
+                        ->label('Peran / Role')
+                        ->badge()
+                        ->color('primary')
+                        ->placeholder('—'),
+
+                    \Filament\Infolists\Components\TextEntry::make('status')
+                        ->label('Status Akun')
+                        ->badge()
+                        ->formatStateUsing(fn (?UserStatus $state): string => $state ? ucfirst($state->value) : '—')
+                        ->color(fn (?UserStatus $state): string => match ($state) {
+                            UserStatus::Pending  => 'warning',
+                            UserStatus::Active   => 'success',
+                            UserStatus::Inactive => 'danger',
+                            UserStatus::Locked   => 'secondary',
+                            default              => 'gray',
+                        }),
+
+                    \Filament\Infolists\Components\TextEntry::make('last_login_at')
+                        ->label('Terakhir Login')
+                        ->dateTime('d M Y H:i:s')
+                        ->placeholder('Belum Pernah Login'),
+
+                    \Filament\Infolists\Components\TextEntry::make('last_login_ip')
+                        ->label('IP Terakhir')
+                        ->placeholder('—'),
+
+                    \Filament\Infolists\Components\TextEntry::make('created_at')
+                        ->label('Terdaftar Pada')
+                        ->dateTime('d M Y H:i'),
+                ])->columns(4),
+        ]);
     }
 
     public static function getPages(): array

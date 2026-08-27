@@ -87,7 +87,25 @@ class MediaResource extends Resource
                     ->icon('heroicon-o-newspaper')
                     ->columnSpan(2)
                     ->schema([
+                        TextInput::make('brand_name')
+                            ->id('brand_name')
+                            ->extraInputAttributes(['id' => 'brand_name'])
+                            ->label('Nama Media / Brand')
+                            ->placeholder('Tepian News')
+                            ->required()
+                            ->maxLength(255),
+
+                        TextInput::make('company_name')
+                            ->id('company_name')
+                            ->extraInputAttributes(['id' => 'company_name'])
+                            ->label('Nama Perusahaan / Badan Hukum')
+                            ->placeholder('PT Media Utama Mandiri')
+                            ->required()
+                            ->maxLength(255),
+
                         Select::make('user_id')
+                            ->id('user_id')
+                            ->extraInputAttributes(['id' => 'user_id'])
                             ->label('Akun Pemilik (Media Partner)')
                             ->relationship('user', 'name', fn ($query) => $query->whereHas(
                                 'roles',
@@ -99,11 +117,15 @@ class MediaResource extends Resource
                             ->required()
                             ->createOptionForm([
                                 TextInput::make('name')
+                                    ->id('new_user_name')
+                                    ->extraInputAttributes(['id' => 'new_user_name'])
                                     ->label('Nama Lengkap')
                                     ->placeholder('Contoh: Budi Santoso')
                                     ->required()
                                     ->maxLength(255),
                                 TextInput::make('email')
+                                    ->id('new_user_email')
+                                    ->extraInputAttributes(['id' => 'new_user_email'])
                                     ->label('Email Login')
                                     ->placeholder('redaksi@media.com')
                                     ->email()
@@ -111,6 +133,8 @@ class MediaResource extends Resource
                                     ->unique('users', 'email')
                                     ->maxLength(255),
                                 TextInput::make('password')
+                                    ->id('new_user_password')
+                                    ->extraInputAttributes(['id' => 'new_user_password'])
                                     ->label('Password')
                                     ->password()
                                     ->required()
@@ -126,45 +150,47 @@ class MediaResource extends Resource
                                 return $user->id;
                             })
                             ->disabled(fn () => ! auth()->user()?->hasAnyRole(['super_admin', 'diskominfo_admin']))
-                            ->helperText('Akun yang memiliki dan mengelola profil ini. Klik tombol (+) untuk buat akun baru.'),
+                            ->helperText('Akun yang memiliki dan mengelola profil ini. Klik (+) untuk buat akun baru.'),
 
                         Select::make('media_category_id')
+                            ->id('media_category_id')
+                            ->extraInputAttributes(['id' => 'media_category_id'])
                             ->label('Kategori Media')
                             ->relationship('mediaCategory', 'name', fn ($query) => $query->where('is_active', true))
                             ->searchable()
                             ->preload()
                             ->required(),
 
-                        TextInput::make('company_name')
-                            ->label('Nama Perusahaan / Badan Hukum')
-                            ->placeholder('PT Media Utama Mandiri')
-                            ->required()
-                            ->maxLength(255),
-
-                        TextInput::make('brand_name')
-                            ->label('Nama Media / Brand')
-                            ->placeholder('Tepian News')
-                            ->required()
-                            ->maxLength(255),
-
-                        TextInput::make('website')
-                            ->label('Alamat Website')
-                            ->placeholder('https://...')
-                            ->url()
-                            ->maxLength(255),
-
                         TextInput::make('email')
+                            ->id('email')
+                            ->extraInputAttributes(['id' => 'email'])
                             ->label('Email Redaksi')
+                            ->placeholder('redaksi@media.com')
                             ->email()
                             ->maxLength(255),
 
                         TextInput::make('phone')
+                            ->id('phone')
+                            ->extraInputAttributes(['id' => 'phone'])
                             ->label('Nomor Telepon / WhatsApp')
+                            ->placeholder('0812...')
                             ->tel()
                             ->maxLength(50),
 
+                        TextInput::make('website')
+                            ->id('website')
+                            ->extraInputAttributes(['id' => 'website'])
+                            ->label('Alamat Website')
+                            ->placeholder('https://...')
+                            ->url()
+                            ->maxLength(255)
+                            ->columnSpanFull(),
+
                         Textarea::make('address')
+                            ->id('address')
+                            ->extraInputAttributes(['id' => 'address'])
                             ->label('Alamat Kantor')
+                            ->placeholder('Alamat lengkap kantor redaksi...')
                             ->rows(2)
                             ->columnSpanFull(),
                     ])->columns(2),
@@ -175,6 +201,8 @@ class MediaResource extends Resource
                     ->columnSpan(1)
                     ->schema([
                         SpatieMediaLibraryFileUpload::make('logo')
+                            ->id('logo')
+                            ->extraInputAttributes(['id' => 'logo'])
                             ->label('Logo Media')
                             ->collection('logos')
                             ->image()
@@ -195,10 +223,14 @@ class MediaResource extends Resource
                 ->icon('heroicon-o-users')
                 ->schema([
                     TextInput::make('director')
+                        ->id('director')
+                        ->extraInputAttributes(['id' => 'director'])
                         ->label('Direktur / Pimpinan Perusahaan')
                         ->maxLength(255),
 
                     TextInput::make('chief_editor')
+                        ->id('chief_editor')
+                        ->extraInputAttributes(['id' => 'chief_editor'])
                         ->label('Pemimpin Redaksi')
                         ->maxLength(255),
                 ])->columns(2),
@@ -207,6 +239,7 @@ class MediaResource extends Resource
                 ->icon('heroicon-o-document-text')
                 ->schema([
                     RichEditor::make('description')
+                        ->id('description')
                         ->label('Profil Singkat Perusahaan')
                         ->toolbarButtons([
                             'bold', 'italic', 'underline',
@@ -317,6 +350,51 @@ class MediaResource extends Resource
                 ViewAction::make(),
                 EditAction::make(),
 
+                Action::make('merge_pdf')
+                    ->label(fn (Media $record): string => $record->merged_pdf_url ? 'Generate Ulang PDF' : 'Gabungkan Dokumen PDF')
+                    ->icon('heroicon-o-document-duplicate')
+                    ->color('info')
+                    ->action(function (Media $record): void {
+                        if ($record->mediaDocuments()->count() === 0) {
+                            Notification::make()
+                                ->title('Belum ada dokumen yang diunggah.')
+                                ->body('Silakan unggah setidaknya 1 dokumen terlebih dahulu.')
+                                ->warning()
+                                ->send();
+                            return;
+                        }
+
+                        try {
+                            app(\App\Actions\MergeMediaDocumentsAction::class)->execute($record);
+                            Notification::make()
+                                ->title('PDF gabungan berhasil dibuat.')
+                                ->body("Dokumen tersedia: {$record->available_documents_count} dari {$record->total_required_documents_count} dokumen wajib.")
+                                ->success()
+                                ->send();
+                        } catch (\Exception $e) {
+                            Notification::make()
+                                ->title('Gagal menggabungkan PDF')
+                                ->body($e->getMessage())
+                                ->danger()
+                                ->send();
+                        }
+                    }),
+
+                Action::make('view_merged_pdf')
+                    ->label('Lihat PDF')
+                    ->icon('heroicon-o-eye')
+                    ->color('primary')
+                    ->visible(fn (Media $record): bool => $record->merged_pdf_url !== null)
+                    ->url(fn (Media $record): string => route('media.merged-pdf.show', $record))
+                    ->openUrlInNewTab(),
+
+                Action::make('download_merged_pdf')
+                    ->label('Download PDF')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('success')
+                    ->visible(fn (Media $record): bool => $record->merged_pdf_url !== null)
+                    ->url(fn (Media $record): string => route('media.merged-pdf.download', $record)),
+
                 Action::make('recalculate')
                     ->label('Hitung Ulang Skor')
                     ->icon('heroicon-o-arrow-path')
@@ -361,131 +439,140 @@ class MediaResource extends Resource
     public static function infolist(Schema $schema): Schema
     {
         return $schema->schema([
-            Grid::make(3)->schema([
-                Section::make('Profil Media')
-                    ->columnSpan(2)
-                    ->schema([
-                        TextEntry::make('brand_name')
-                            ->label('Nama Media / Brand')
-                            ->size('lg')
-                            ->weight('bold'),
+            // Card 1: Identitas & Status Utama Media (Compact Header Grid)
+            Section::make('Informasi & Status Mitra Media')
+                ->icon('heroicon-o-newspaper')
+                ->schema([
+                    SpatieMediaLibraryImageEntry::make('logo')
+                        ->label('Logo')
+                        ->collection('logos')
+                        ->circular()
+                        ->defaultImageUrl(fn (Media $record) => $record->logo_url),
 
-                        TextEntry::make('company_name')
-                            ->label('Nama Perusahaan (Badan Hukum)'),
+                    TextEntry::make('brand_name')
+                        ->label('Nama Media / Brand')
+                        ->size('lg')
+                        ->weight('bold'),
 
-                        TextEntry::make('mediaCategory.name')
-                            ->label('Kategori Media')
-                            ->badge()
-                            ->color('primary'),
+                    TextEntry::make('company_name')
+                        ->label('Nama Perusahaan (Badan Hukum)')
+                        ->weight('semibold')
+                        ->placeholder('—'),
 
-                        TextEntry::make('website')
-                            ->label('Website')
-                            ->url(fn ($state) => $state)
-                            ->openUrlInNewTab()
-                            ->color('info'),
+                    TextEntry::make('mediaCategory.name')
+                        ->label('Kategori Media')
+                        ->badge()
+                        ->color('primary')
+                        ->placeholder('—'),
 
-                        TextEntry::make('email')
-                            ->label('Email Redaksi'),
+                    TextEntry::make('verification_status')
+                        ->label('Status Verifikasi')
+                        ->badge()
+                        ->color(fn (MediaVerificationStatus $state): string => match ($state) {
+                            MediaVerificationStatus::APPROVED => 'success',
+                            MediaVerificationStatus::PENDING  => 'warning',
+                            MediaVerificationStatus::REVISION => 'info',
+                            MediaVerificationStatus::REJECTED => 'danger',
+                            default                           => 'gray',
+                        })
+                        ->formatStateUsing(fn (MediaVerificationStatus $state): string => match ($state) {
+                            MediaVerificationStatus::APPROVED => 'Terverifikasi',
+                            MediaVerificationStatus::PENDING  => 'Menunggu Verifikasi',
+                            MediaVerificationStatus::REVISION => 'Butuh Revisi',
+                            MediaVerificationStatus::REJECTED => 'Ditolak',
+                            MediaVerificationStatus::DRAFT    => 'Draft',
+                        }),
 
-                        TextEntry::make('phone')
-                            ->label('Telepon'),
+                    TextEntry::make('completeness_percentage')
+                        ->label('Kelengkapan Dokumen')
+                        ->formatStateUsing(fn ($state) => $state . '%')
+                        ->badge()
+                        ->color(fn (int $state): string => match (true) {
+                            $state >= 80 => 'success',
+                            $state >= 50 => 'warning',
+                            default      => 'danger',
+                        }),
 
-                        TextEntry::make('director')
-                            ->label('Direktur / Pimpinan'),
+                    TextEntry::make('verification_score')
+                        ->label('Skor Verifikasi')
+                        ->formatStateUsing(fn ($state) => $state . '%')
+                        ->badge()
+                        ->color(fn (int $state): string => match (true) {
+                            $state >= 80 => 'success',
+                            $state >= 50 => 'warning',
+                            default      => 'danger',
+                        }),
 
-                        TextEntry::make('chief_editor')
-                            ->label('Pemimpin Redaksi'),
+                    TextEntry::make('user.name')
+                        ->label('Akun Pemilik')
+                        ->badge()
+                        ->color('gray')
+                        ->placeholder('—'),
 
-                        TextEntry::make('user.name')
-                            ->label('Akun Pemilik')
-                            ->badge()
-                            ->color('gray'),
+                    TextEntry::make('email')
+                        ->label('Email Redaksi')
+                        ->placeholder('—'),
 
-                        TextEntry::make('address')
-                            ->label('Alamat Kantor')
-                            ->columnSpanFull(),
-                    ])->columns(2),
+                    TextEntry::make('phone')
+                        ->label('Nomor Telepon / WA')
+                        ->placeholder('—'),
 
-                Section::make('Status & Skor')
-                    ->columnSpan(1)
-                    ->schema([
-                        SpatieMediaLibraryImageEntry::make('logo')
-                            ->label('Logo')
-                            ->collection('logos')
-                            ->circular()
-                            ->defaultImageUrl(fn (Media $record) => $record->logo_url),
+                    TextEntry::make('director')
+                        ->label('Direktur / Pimpinan')
+                        ->placeholder('—'),
 
-                        TextEntry::make('verification_status')
-                            ->label('Status Verifikasi')
-                            ->badge()
-                            ->color(fn (MediaVerificationStatus $state): string => match ($state) {
-                                MediaVerificationStatus::APPROVED => 'success',
-                                MediaVerificationStatus::PENDING  => 'warning',
-                                MediaVerificationStatus::REVISION => 'info',
-                                MediaVerificationStatus::REJECTED => 'danger',
-                                default                           => 'gray',
-                            })
-                            ->formatStateUsing(fn (MediaVerificationStatus $state): string => match ($state) {
-                                MediaVerificationStatus::APPROVED => 'Terverifikasi',
-                                MediaVerificationStatus::PENDING  => 'Menunggu Verifikasi',
-                                MediaVerificationStatus::REVISION => 'Butuh Revisi',
-                                MediaVerificationStatus::REJECTED => 'Ditolak',
-                                MediaVerificationStatus::DRAFT    => 'Draft',
-                            }),
+                    TextEntry::make('chief_editor')
+                        ->label('Pemimpin Redaksi')
+                        ->placeholder('—'),
 
-                        TextEntry::make('completeness_percentage')
-                            ->label('Kelengkapan Dokumen')
-                            ->formatStateUsing(fn ($state) => $state . '%')
-                            ->badge()
-                            ->color(fn (int $state): string => match (true) {
-                                $state >= 80 => 'success',
-                                $state >= 50 => 'warning',
-                                default      => 'danger',
-                            }),
+                    TextEntry::make('website')
+                        ->label('Alamat Website')
+                        ->url(fn ($state) => $state)
+                        ->openUrlInNewTab()
+                        ->color('info')
+                        ->placeholder('—')
+                        ->columnSpan(2),
 
-                        TextEntry::make('verification_score')
-                            ->label('Skor Verifikasi')
-                            ->formatStateUsing(fn ($state) => $state . '%')
-                            ->badge()
-                            ->color(fn (int $state): string => match (true) {
-                                $state >= 80 => 'success',
-                                $state >= 50 => 'warning',
-                                default      => 'danger',
-                            }),
+                    TextEntry::make('address')
+                        ->label('Alamat Kantor')
+                        ->placeholder('—')
+                        ->columnSpan(2),
+                ])->columns(4),
 
-                        IconEntry::make('has_expired_documents')
-                            ->label('Dokumen Kedaluwarsa')
-                            ->boolean()
-                            ->trueIcon('heroicon-o-exclamation-triangle')
-                            ->falseIcon('heroicon-o-check-circle')
-                            ->trueColor('danger')
-                            ->falseColor('success'),
-
-                        IconEntry::make('has_expiring_soon_documents')
-                            ->label('Dokumen Segera Kedaluwarsa')
-                            ->boolean()
-                            ->trueIcon('heroicon-o-clock')
-                            ->falseIcon('heroicon-o-check-circle')
-                            ->trueColor('warning')
-                            ->falseColor('success'),
-
-                        TextEntry::make('created_at')
-                            ->label('Terdaftar')
-                            ->dateTime('d M Y H:i'),
-
-                        TextEntry::make('updated_at')
-                            ->label('Diperbarui')
-                            ->dateTime('d M Y H:i'),
-                    ]),
-            ]),
-
-            Section::make('Deskripsi Perusahaan')
+            // Card 2: Deskripsi & System Audit (Compact 2-Column Grid)
+            Section::make('Profil Deskripsi & Status Dokumen')
+                ->icon('heroicon-o-document-text')
                 ->schema([
                     TextEntry::make('description')
-                        ->label('')
+                        ->label('Profil Singkat Perusahaan')
                         ->html()
-                        ->columnSpanFull(),
-                ]),
+                        ->placeholder('Belum ada deskripsi profil perusahaan.')
+                        ->columnSpan(2),
+
+                    IconEntry::make('has_expired_documents')
+                        ->label('Dokumen Kedaluwarsa')
+                        ->boolean()
+                        ->trueIcon('heroicon-o-exclamation-triangle')
+                        ->falseIcon('heroicon-o-check-circle')
+                        ->trueColor('danger')
+                        ->falseColor('success'),
+
+                    IconEntry::make('has_expiring_soon_documents')
+                        ->label('Segera Kedaluwarsa')
+                        ->boolean()
+                        ->trueIcon('heroicon-o-clock')
+                        ->falseIcon('heroicon-o-check-circle')
+                        ->trueColor('warning')
+                        ->falseColor('success'),
+
+                    TextEntry::make('created_at')
+                        ->label('Terdaftar Pada')
+                        ->dateTime('d M Y H:i'),
+
+                    TextEntry::make('updated_at')
+                        ->label('Diperbarui Pada')
+                        ->dateTime('d M Y H:i'),
+                ])->columns(4),
         ]);
     }
 

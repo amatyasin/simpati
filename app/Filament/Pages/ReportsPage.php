@@ -115,6 +115,7 @@ class ReportsPage extends Page implements HasForms
                     ->label('Tanggal Daftar Selesai')
                     ->native(false),
             ])
+            ->columns(4)
             ->statePath('');
     }
 
@@ -155,6 +156,7 @@ class ReportsPage extends Page implements HasForms
                     ->label('Masa Berlaku Selesai')
                     ->native(false),
             ])
+            ->columns(3)
             ->statePath('');
     }
 

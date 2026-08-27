@@ -70,6 +70,8 @@ class MediaCategoryResource extends Resource
 
 
                     TextInput::make('name')
+                        ->id('category_name')
+                        ->extraInputAttributes(['id' => 'category_name'])
                         ->label('Nama Kategori')
                         ->required()
                         ->maxLength(255)
@@ -77,6 +79,8 @@ class MediaCategoryResource extends Resource
                         ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
 
                     TextInput::make('slug')
+                        ->id('category_slug')
+                        ->extraInputAttributes(['id' => 'category_slug'])
                         ->label('Slug')
                         ->required()
                         ->unique(ignoreRecord: true)
@@ -84,6 +88,8 @@ class MediaCategoryResource extends Resource
                         ->helperText('Otomatis dari nama kategori.'),
 
                     Textarea::make('description')
+                        ->id('category_description')
+                        ->extraInputAttributes(['id' => 'category_description'])
                         ->label('Deskripsi')
                         ->rows(3)
                         ->columnSpanFull(),
@@ -93,19 +99,25 @@ class MediaCategoryResource extends Resource
                 ->icon('heroicon-o-paint-brush')
                 ->schema([
                     ColorPicker::make('color')
+                        ->id('category_color')
                         ->label('Warna'),
 
                     TextInput::make('icon')
+                        ->id('category_icon')
+                        ->extraInputAttributes(['id' => 'category_icon'])
                         ->label('Icon')
                         ->placeholder('heroicon-o-tag')
                         ->helperText('Nama heroicon, contoh: heroicon-o-document-text'),
 
                     TextInput::make('sort_order')
+                        ->id('category_sort_order')
+                        ->extraInputAttributes(['id' => 'category_sort_order'])
                         ->label('Urutan Tampil')
                         ->numeric()
                         ->default(0),
 
                     Toggle::make('is_active')
+                        ->id('category_is_active')
                         ->label('Aktif')
                         ->default(true)
                         ->onColor('success')
