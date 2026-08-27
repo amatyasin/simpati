@@ -3,6 +3,7 @@
 namespace App\Filament\Pages\Auth;
 
 use App\Rules\TurnstileRule;
+use Filament\Auth\Http\Responses\Contracts\LoginResponse;
 use Filament\Auth\Pages\Login as BaseLogin;
 use Filament\Forms\Components\ViewField;
 use Filament\Schemas\Schema;
@@ -23,9 +24,12 @@ class Login extends BaseLogin
             ]);
     }
 
-    protected function getCredentialsFromFormData(array $data): array
+    public function authenticate(): ?LoginResponse
     {
-        $turnstileResponse = request()->input('cf-turnstile-response') ?? request()->input('turnstile') ?? null;
+        $turnstileResponse = request()->header('X-Turnstile-Token')
+            ?? request()->input('cf-turnstile-response')
+            ?? request()->input('turnstile')
+            ?? null;
 
         $validator = validator(
             ['turnstile' => $turnstileResponse],
@@ -38,6 +42,6 @@ class Login extends BaseLogin
             ]);
         }
 
-        return parent::getCredentialsFromFormData($data);
+        return parent::authenticate();
     }
 }
