@@ -13,6 +13,11 @@ class MediaByCategoryWidget extends ChartWidget
 
     protected ?string $maxHeight = '300px';
 
+    public static function canView(): bool
+    {
+        return ! auth()->user()?->hasRole('media_partner');
+    }
+
     protected function getData(): array
     {
         $data = MediaCategory::withCount('media')

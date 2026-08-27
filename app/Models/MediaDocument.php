@@ -46,6 +46,7 @@ class MediaDocument extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('documents')
+            ->useDisk('public')
             ->singleFile()
             ->acceptsMimeTypes([
                 'application/pdf',
@@ -56,6 +57,7 @@ class MediaDocument extends Model implements HasMedia
             ]);
 
         $this->addMediaCollection('verification-files')
+            ->useDisk('public')
             ->singleFile();
     }
 

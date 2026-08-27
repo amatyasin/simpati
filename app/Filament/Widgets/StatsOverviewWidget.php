@@ -16,6 +16,44 @@ class StatsOverviewWidget extends BaseWidget
 
     protected function getStats(): array
     {
+        $user = auth()->user();
+
+        if ($user && $user->hasRole('media_partner')) {
+            $mediaId = Media::where('user_id', $user->id)->value('id');
+            $media = Media::where('user_id', $user->id)->first();
+            
+            $totalDocs = \App\Models\MediaDocument::where('media_id', $mediaId)->count();
+            $pendingDocs = \App\Models\MediaDocument::where('media_id', $mediaId)->pending()->count();
+            $expiredDocs = \App\Models\MediaDocument::where('media_id', $mediaId)->expired()->count();
+            $completeness = $media?->completeness_percentage ?? 0;
+
+            return [
+                Stat::make('Kelengkapan Profil', $completeness . '%')
+                    ->description('Persentase kelengkapan data')
+                    ->descriptionIcon('heroicon-o-check-badge')
+                    ->color($completeness >= 80 ? 'success' : 'warning')
+                    ->chart([$completeness, $completeness]),
+
+                Stat::make('Total Dokumen', $totalDocs)
+                    ->description('Dokumen yang diunggah')
+                    ->descriptionIcon('heroicon-o-document-duplicate')
+                    ->color('info')
+                    ->chart([0, 1, 2, $totalDocs]),
+
+                Stat::make('Dokumen Menunggu', $pendingDocs)
+                    ->description('Menunggu verifikasi admin')
+                    ->descriptionIcon('heroicon-o-clock')
+                    ->color($pendingDocs > 0 ? 'warning' : 'success')
+                    ->chart([0, 1, 2, $pendingDocs]),
+
+                Stat::make('Dokumen Kedaluwarsa', $expiredDocs)
+                    ->description('Dokumen yang tidak berlaku')
+                    ->descriptionIcon('heroicon-o-exclamation-triangle')
+                    ->color($expiredDocs > 0 ? 'danger' : 'success')
+                    ->chart([0, 1, 2, $expiredDocs]),
+            ];
+        }
+
         $totalMitra = Media::count();
         $approvedMitra = Media::where('verification_status', MediaVerificationStatus::APPROVED->value)->count();
 

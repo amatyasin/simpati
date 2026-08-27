@@ -38,6 +38,11 @@ class ReportsPage extends Page implements HasForms
         return null;
     }
 
+    public static function canAccess(): bool
+    {
+        return ! auth()->user()?->hasRole('media_partner');
+    }
+
     public ?string $partnerStatus = 'all';
     public ?int $partnerCategoryId = null;
     

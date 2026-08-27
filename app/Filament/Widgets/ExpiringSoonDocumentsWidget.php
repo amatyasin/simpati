@@ -17,13 +17,17 @@ class ExpiringSoonDocumentsWidget extends BaseWidget
 
     public function table(Table $table): Table
     {
+        $query = MediaDocument::query()
+            ->expiringSoon(30)
+            ->with(['mediaPartner', 'documentType'])
+            ->orderBy('expiration_date', 'asc');
+
+        if (auth()->user()?->hasRole('media_partner')) {
+            $query->whereHas('mediaPartner', fn ($q) => $q->where('user_id', auth()->id()));
+        }
+
         return $table
-            ->query(
-                MediaDocument::query()
-                    ->expiringSoon(30)
-                    ->with(['mediaPartner', 'documentType'])
-                    ->orderBy('expiration_date', 'asc')
-            )
+            ->query($query)
             ->columns([
                 TextColumn::make('mediaPartner.brand_name')
                     ->label('Mitra Media')

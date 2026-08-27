@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('login_activities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->timestamp('login_at')->nullable();
             $table->timestamp('logout_at')->nullable();
             $table->string('ip_address', 45)->nullable(); // IPv6 compatible

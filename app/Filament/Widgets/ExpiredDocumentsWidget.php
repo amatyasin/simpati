@@ -17,17 +17,23 @@ class ExpiredDocumentsWidget extends BaseWidget
 
     public function table(Table $table): Table
     {
+        $query = \App\Models\MediaDocument::query()
+            ->expired()
+            ->with(['mediaPartner', 'documentType'])
+            ->orderBy('expiration_date', 'asc');
+
+        if (auth()->user()?->hasRole('media_partner')) {
+            $query->whereHas('mediaPartner', fn ($q) => $q->where('user_id', auth()->id()));
+        }
+
         return $table
-            ->query(
-                ExpiredDocumentView::query()
-                    ->orderBy('expiration_date', 'asc')
-            )
+            ->query($query)
             ->columns([
-                TextColumn::make('brand_name')
+                TextColumn::make('mediaPartner.brand_name')
                     ->label('Nama Media')
                     ->weight('semibold'),
 
-                TextColumn::make('document_type_name')
+                TextColumn::make('documentType.name')
                     ->label('Tipe Dokumen')
                     ->badge()
                     ->color('danger'),

@@ -16,6 +16,11 @@ class RecentMediaWidget extends BaseWidget
 
     protected int|string|array $columnSpan = 'full';
 
+    public static function canView(): bool
+    {
+        return ! auth()->user()?->hasRole('media_partner');
+    }
+
     public function table(Table $table): Table
     {
         return $table

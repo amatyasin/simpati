@@ -28,7 +28,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Forms\Get;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -83,7 +83,9 @@ class MediaDocumentResource extends Resource
                         ->searchable()
                         ->preload()
                         ->required()
-                        ->disabled(fn () => ! auth()->user()?->hasAnyRole(['super_admin', 'diskominfo_admin'])),
+                        ->default(fn () => auth()->user()?->hasRole('media_partner') ? \App\Models\Media::where('user_id', auth()->id())->value('id') : null)
+                        ->disabled(fn () => ! auth()->user()?->hasAnyRole(['super_admin', 'diskominfo_admin']))
+                        ->dehydrated(),
 
                     Select::make('document_type_id')
                         ->label('Tipe Dokumen')

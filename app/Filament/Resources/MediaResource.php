@@ -97,8 +97,36 @@ class MediaResource extends Resource
                             ->preload()
                             ->unique(ignoreRecord: true)
                             ->required()
+                            ->createOptionForm([
+                                TextInput::make('name')
+                                    ->label('Nama Lengkap')
+                                    ->placeholder('Contoh: Budi Santoso')
+                                    ->required()
+                                    ->maxLength(255),
+                                TextInput::make('email')
+                                    ->label('Email Login')
+                                    ->placeholder('redaksi@media.com')
+                                    ->email()
+                                    ->required()
+                                    ->unique('users', 'email')
+                                    ->maxLength(255),
+                                TextInput::make('password')
+                                    ->label('Password')
+                                    ->password()
+                                    ->required()
+                                    ->minLength(8),
+                            ])
+                            ->createOptionUsing(function (array $data): int {
+                                $user = \App\Models\User::create([
+                                    'name' => $data['name'],
+                                    'email' => $data['email'],
+                                    'password' => \Illuminate\Support\Facades\Hash::make($data['password']),
+                                ]);
+                                $user->assignRole('media_partner');
+                                return $user->id;
+                            })
                             ->disabled(fn () => ! auth()->user()?->hasAnyRole(['super_admin', 'diskominfo_admin']))
-                            ->helperText('Akun yang memiliki dan mengelola profil ini.'),
+                            ->helperText('Akun yang memiliki dan mengelola profil ini. Klik tombol (+) untuk buat akun baru.'),
 
                         Select::make('media_category_id')
                             ->label('Kategori Media')

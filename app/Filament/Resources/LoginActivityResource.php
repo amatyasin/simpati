@@ -28,14 +28,18 @@ class LoginActivityResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('user.name')->label('User')->searchable()->sortable(),
+                TextColumn::make('user.name')->label('User')->default('Guest / Unknown')->searchable()->sortable(),
                 TextColumn::make('login_at')->dateTime('Y-m-d H:i')->sortable(),
                 TextColumn::make('logout_at')->dateTime('Y-m-d H:i')->sortable(),
                 TextColumn::make('ip_address')->searchable(),
                 TextColumn::make('status')
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => ucfirst($state))
-                    ->color(fn (string $state): string => $state === 'login' ? 'success' : 'danger'),
+                    ->color(fn (string $state): string => match ($state) {
+                        'successful' => 'success',
+                        'locked' => 'warning',
+                        default => 'danger',
+                    }),
             ])
             ->actions([
                 ViewAction::make(),
