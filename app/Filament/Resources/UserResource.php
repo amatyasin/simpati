@@ -13,6 +13,7 @@ use Filament\Tables\Columns\TextColumn;
 
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Actions\ViewAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -76,6 +77,7 @@ class UserResource extends Resource
                             ->label('Password')
                             ->password()
                             ->required(fn (string $operation): bool => $operation === 'create')
+                            ->dehydrated(fn (?string $state): bool => filled($state))
                             ->minLength(8)
                             ->maxLength(255),
 

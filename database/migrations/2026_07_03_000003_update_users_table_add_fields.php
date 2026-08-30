@@ -12,7 +12,8 @@ return new class extends Migration {
     {
         Schema::table('users', function (Blueprint $table) {
             $table->enum('status', ['pending', 'active', 'inactive', 'locked'])->default('pending')->after('remember_token');
-            $table->string('avatar')->nullable()->after('status');
+            $table->string('phone', 20)->nullable()->after('status');
+            $table->string('avatar')->nullable()->after('phone');
             $table->timestamp('last_login_at')->nullable()->after('avatar');
             $table->string('last_login_ip', 45)->nullable()->after('last_login_at');
             $table->unsignedInteger('failed_login_count')->default(0)->after('last_login_ip');
@@ -25,7 +26,7 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['status', 'avatar', 'last_login_at', 'last_login_ip', 'failed_login_count']);
+            $table->dropColumn(['status', 'phone', 'avatar', 'last_login_at', 'last_login_ip', 'failed_login_count']);
         });
     }
 };
