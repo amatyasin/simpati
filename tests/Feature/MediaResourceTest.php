@@ -3,13 +3,14 @@
 use App\Models\Media;
 use App\Models\MediaCategory;
 use App\Models\User;
-use Spatie\Permission\Models\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 uses(RefreshDatabase::class);
 
 test('media resource edit page loads for authorized users', function () {
-    app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+    app(PermissionRegistrar::class)->forgetCachedPermissions();
 
     // 1. Create role and admin user
     $superAdminRole = Role::create(['name' => 'super_admin']);
@@ -43,7 +44,7 @@ test('media resource edit page loads for authorized users', function () {
         'verification_status' => 'draft',
     ]);
 
-    app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+    app(PermissionRegistrar::class)->forgetCachedPermissions();
 
     // 5. Test accessing the edit page
     $this->actingAs($admin)

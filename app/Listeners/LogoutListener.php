@@ -4,7 +4,6 @@ namespace App\Listeners;
 
 use App\Models\LoginActivity;
 use Illuminate\Auth\Events\Logout;
-use Illuminate\Support\Facades\DB;
 
 class LogoutListener
 {
@@ -14,7 +13,7 @@ class LogoutListener
     public function handle(Logout $event): void
     {
         $user = $event->user;
-        if (!$user) {
+        if (! $user) {
             return;
         }
 

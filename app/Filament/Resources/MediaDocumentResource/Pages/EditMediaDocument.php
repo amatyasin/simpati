@@ -31,9 +31,9 @@ class EditMediaDocument extends EditRecord
         // When media partner re-uploads, reset to pending
         if (auth()->user()?->hasRole('media_partner')) {
             $data['verification_status'] = DocumentVerificationStatus::PENDING->value;
-            $data['verification_notes']  = null;
-            $data['verifier_id']         = null;
-            $data['verified_at']         = null;
+            $data['verification_notes'] = null;
+            $data['verifier_id'] = null;
+            $data['verified_at'] = null;
         }
 
         return $data;

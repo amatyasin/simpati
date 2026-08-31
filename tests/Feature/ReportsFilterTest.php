@@ -1,12 +1,13 @@
 <?php
 
+use App\Exports\MediaExport;
+use App\Exports\VerificationExport;
+use App\Models\DocumentType;
 use App\Models\Media;
 use App\Models\MediaCategory;
 use App\Models\MediaDocument;
-use App\Models\DocumentType;
-use App\Exports\MediaExport;
-use App\Exports\VerificationExport;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 
 uses(RefreshDatabase::class);
 
@@ -68,7 +69,7 @@ test('MediaExport filters by completeness percentage range', function () {
 
 test('MediaExport filters by registration date range', function () {
     // Force media1 to a deterministic past date via DB to bypass Eloquent timestamps
-    \Illuminate\Support\Facades\DB::table('media')
+    DB::table('media')
         ->where('id', $this->media1->id)
         ->update(['created_at' => '2025-01-01 12:00:00', 'updated_at' => '2025-01-01 12:00:00']);
 
@@ -114,12 +115,12 @@ test('VerificationExport filters documents by date range', function () {
 
     // Filter documents expiring in less than 10 days
     $export = new VerificationExport(
-        status: 'all', 
-        documentTypeId: null, 
+        status: 'all',
+        documentTypeId: null,
         startDate: now()->format('Y-m-d'),
         endDate: now()->addDays(10)->format('Y-m-d')
     );
-    
+
     $records = $export->collection();
     expect($records->count())->toBe(1);
     expect($records->first()->document_number)->toBe('123-TUGAS');

@@ -53,8 +53,8 @@ class VerificationLog extends Model
                 DocumentVerificationStatus::APPROVED => 'Disetujui',
                 DocumentVerificationStatus::REJECTED => 'Ditolak',
                 DocumentVerificationStatus::REVISION => 'Butuh Revisi',
-                DocumentVerificationStatus::PENDING  => 'Menunggu Verifikasi',
-                default                              => ucfirst($this->status?->value ?? ''),
+                DocumentVerificationStatus::PENDING => 'Menunggu Verifikasi',
+                default => ucfirst($this->status?->value ?? ''),
             };
         });
     }

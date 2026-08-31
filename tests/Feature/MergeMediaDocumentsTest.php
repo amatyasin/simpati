@@ -7,6 +7,7 @@ use App\Models\Media;
 use App\Models\MediaCategory;
 use App\Models\MediaDocument;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -14,8 +15,10 @@ use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
-function createFakePdfFile(string $filename = 'test.pdf'): UploadedFile {
-    $pdfContent = \Barryvdh\DomPDF\Facade\Pdf::loadHTML('<html><body><h1>Test Document</h1></body></html>')->output();
+function createFakePdfFile(string $filename = 'test.pdf'): UploadedFile
+{
+    $pdfContent = Pdf::loadHTML('<html><body><h1>Test Document</h1></body></html>')->output();
+
     return UploadedFile::fake()->createWithContent($filename, $pdfContent);
 }
 
@@ -80,7 +83,7 @@ beforeEach(function () {
 test('merging PDF fails when no documents are uploaded', function () {
     expect(function () {
         app(MergeMediaDocumentsAction::class)->execute($this->media);
-    })->toThrow(\RuntimeException::class, 'Tidak ada dokumen yang tersedia untuk digabungkan.');
+    })->toThrow(RuntimeException::class, 'Tidak ada dokumen yang tersedia untuk digabungkan.');
 
     expect($this->media->merged_pdf_url)->toBeNull();
 });
@@ -207,4 +210,35 @@ test('unauthorized user cannot view merged pdf of another media partner', functi
         ->get(route('media.merged-pdf.show', $this->media));
 
     $response->assertStatus(403);
+});
+
+test('merging PDF handles PDF 1.5+ compressed object streams using binary normalization', function () {
+    $doc = MediaDocument::create([
+        'media_id' => $this->media->id,
+        'document_type_id' => $this->docTypeAkte->id,
+        'document_number' => 'DOC-AKTE-COMPRESSED',
+        'issue_date' => now(),
+        'verification_status' => DocumentVerificationStatus::APPROVED->value,
+    ]);
+
+    // Create standard PDF and compress object streams using qpdf
+    $rawPdfContent = Pdf::loadHTML('<html><body><h1>Compressed Stream Test</h1></body></html>')->output();
+    $rawTemp = sys_get_temp_dir().'/raw_'.uniqid().'.pdf';
+    $compressedTemp = sys_get_temp_dir().'/compressed_'.uniqid().'.pdf';
+    file_put_contents($rawTemp, $rawPdfContent);
+
+    // Compress object streams with qpdf
+    exec(sprintf('/opt/homebrew/bin/qpdf --object-streams=generate %s %s 2>&1', escapeshellarg($rawTemp), escapeshellarg($compressedTemp)));
+
+    $compressedContent = file_get_contents($compressedTemp);
+    @unlink($rawTemp);
+    @unlink($compressedTemp);
+
+    $uploadedFile = UploadedFile::fake()->createWithContent('compressed.pdf', $compressedContent, 'application/pdf');
+    $doc->addMedia($uploadedFile)->toMediaCollection('documents', 'public');
+
+    $updatedMedia = app(MergeMediaDocumentsAction::class)->execute($this->media);
+
+    expect(file_exists($updatedMedia->merged_pdf_path))->toBeTrue();
+    expect($updatedMedia->available_documents_count)->toBe(1);
 });

@@ -7,6 +7,7 @@ use App\Enums\MediaVerificationStatus;
 use App\Models\DocumentType;
 use App\Models\Media;
 use App\Services\MediaScoreService;
+use App\Services\NotificationService;
 
 class RecalculateMediaScoreAction
 {
@@ -23,17 +24,17 @@ class RecalculateMediaScoreAction
         $oldCompleteness = $media->completeness_percentage;
 
         $completeness = $this->scoreService->calculateCompleteness($media);
-        $score        = $this->scoreService->calculateVerificationScore($media);
-        $status       = $this->resolveStatus($media);
+        $score = $this->scoreService->calculateVerificationScore($media);
+        $status = $this->resolveStatus($media);
 
         $media->updateQuietly([
             'completeness_percentage' => $completeness,
-            'verification_score'      => $score,
-            'verification_status'     => $status,
+            'verification_score' => $score,
+            'verification_status' => $status,
         ]);
 
         if ($completeness < 100 && $oldCompleteness == 100) {
-            app(\App\Services\NotificationService::class)->notifyProfileIncomplete($media);
+            app(NotificationService::class)->notifyProfileIncomplete($media);
         }
     }
 

@@ -21,15 +21,15 @@ class TurnstileRule implements ValidationRule
             return;
         }
 
-
         if (empty($value)) {
             $fail('Silakan selesaikan verifikasi Cloudflare Turnstile CAPTCHA.');
+
             return;
         }
 
         try {
             $response = Http::asForm()->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
-                'secret'   => $secretKey,
+                'secret' => $secretKey,
                 'response' => $value,
                 'remoteip' => request()->ip(),
             ]);

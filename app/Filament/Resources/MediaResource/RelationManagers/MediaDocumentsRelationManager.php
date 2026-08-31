@@ -6,9 +6,8 @@ use App\Actions\RejectDocumentAction;
 use App\Actions\RequestRevisionAction;
 use App\Actions\VerifyDocumentAction;
 use App\Enums\DocumentVerificationStatus;
-use App\Models\DocumentType;
 use App\Models\MediaDocument;
-use App\Services\MediaScoreService;
+use App\Services\NotificationService;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -24,7 +23,6 @@ use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -115,14 +113,14 @@ class MediaDocumentsRelationManager extends RelationManager
                     ->label('Tgl Kedaluwarsa')
                     ->date('d M Y')
                     ->color(fn (MediaDocument $record) => match (true) {
-                        $record->is_expired        => 'danger',
-                        $record->is_expiring_soon  => 'warning',
-                        default                    => 'gray',
+                        $record->is_expired => 'danger',
+                        $record->is_expiring_soon => 'warning',
+                        default => 'gray',
                     })
                     ->description(fn (MediaDocument $record) => match (true) {
-                        $record->is_expired        => '⚠️ Kedaluwarsa',
-                        $record->is_expiring_soon  => '🔔 Segera Kedaluwarsa',
-                        default                    => '',
+                        $record->is_expired => '⚠️ Kedaluwarsa',
+                        $record->is_expiring_soon => '🔔 Segera Kedaluwarsa',
+                        default => '',
                     })
                     ->sortable(),
 
@@ -131,13 +129,13 @@ class MediaDocumentsRelationManager extends RelationManager
                     ->badge()
                     ->color(fn (DocumentVerificationStatus $state): string => match ($state) {
                         DocumentVerificationStatus::APPROVED => 'success',
-                        DocumentVerificationStatus::PENDING  => 'warning',
+                        DocumentVerificationStatus::PENDING => 'warning',
                         DocumentVerificationStatus::REVISION => 'info',
                         DocumentVerificationStatus::REJECTED => 'danger',
                     })
                     ->formatStateUsing(fn (DocumentVerificationStatus $state): string => match ($state) {
                         DocumentVerificationStatus::APPROVED => 'Disetujui ✅',
-                        DocumentVerificationStatus::PENDING  => 'Menunggu ⏳',
+                        DocumentVerificationStatus::PENDING => 'Menunggu ⏳',
                         DocumentVerificationStatus::REVISION => 'Revisi ✏️',
                         DocumentVerificationStatus::REJECTED => 'Ditolak ❌',
                     })
@@ -173,14 +171,14 @@ class MediaDocumentsRelationManager extends RelationManager
                     ->label('Unggah Dokumen Baru')
                     ->mutateFormDataUsing(function (array $data): array {
                         $data['verification_status'] = DocumentVerificationStatus::PENDING->value;
-                        $data['verifier_id']         = null;
-                        $data['verification_notes']  = null;
+                        $data['verifier_id'] = null;
+                        $data['verification_notes'] = null;
 
                         return $data;
                     })
                     ->after(function (MediaDocument $record): void {
                         // Notify admins of new upload
-                        app(\App\Services\NotificationService::class)
+                        app(NotificationService::class)
                             ->notifyAdminsOfNewDocument($record);
                     }),
             ])
@@ -198,7 +196,7 @@ class MediaDocumentsRelationManager extends RelationManager
                                     ->badge()
                                     ->color(fn (DocumentVerificationStatus $state) => match ($state) {
                                         DocumentVerificationStatus::APPROVED => 'success',
-                                        DocumentVerificationStatus::PENDING  => 'warning',
+                                        DocumentVerificationStatus::PENDING => 'warning',
                                         DocumentVerificationStatus::REVISION => 'info',
                                         DocumentVerificationStatus::REJECTED => 'danger',
                                     }),
@@ -219,7 +217,7 @@ class MediaDocumentsRelationManager extends RelationManager
                         // Media partner re-submission resets status to pending
                         if (auth()->user()?->hasRole('media_partner')) {
                             $data['verification_status'] = DocumentVerificationStatus::PENDING->value;
-                            $data['verification_notes']  = null;
+                            $data['verification_notes'] = null;
                         }
 
                         return $data;

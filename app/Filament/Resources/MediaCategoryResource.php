@@ -14,7 +14,6 @@ use Filament\Actions\RestoreAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -27,7 +26,6 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
@@ -67,7 +65,6 @@ class MediaCategoryResource extends Resource
             Section::make('Informasi Kategori')
                 ->icon('heroicon-o-tag')
                 ->schema([
-
 
                     TextInput::make('name')
                         ->id('category_name')
@@ -145,8 +142,6 @@ class MediaCategoryResource extends Resource
                     ->color('gray')
                     ->searchable(),
 
-
-
                 TextColumn::make('sort_order')
                     ->label('Urutan')
                     ->sortable(),
@@ -169,7 +164,6 @@ class MediaCategoryResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-
 
                 TernaryFilter::make('is_active')
                     ->label('Status Aktif')
@@ -207,8 +201,6 @@ class MediaCategoryResource extends Resource
                         ->label('Slug')
                         ->badge()
                         ->color('gray'),
-
-
 
                     ColorEntry::make('color')
                         ->label('Warna'),

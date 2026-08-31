@@ -2,6 +2,10 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\ExpiredDocumentsWidget;
+use App\Filament\Widgets\ExpiringSoonDocumentsWidget;
+use App\Filament\Widgets\IncompleteMediaWidget;
+use App\Filament\Widgets\MediaRankingWidget;
 use Filament\Pages\Page;
 
 class MonitoringPage extends Page
@@ -29,10 +33,10 @@ class MonitoringPage extends Page
     protected function getHeaderWidgets(): array
     {
         return [
-            \App\Filament\Widgets\MediaRankingWidget::class,
-            \App\Filament\Widgets\IncompleteMediaWidget::class,
-            \App\Filament\Widgets\ExpiredDocumentsWidget::class,
-            \App\Filament\Widgets\ExpiringSoonDocumentsWidget::class,
+            MediaRankingWidget::class,
+            IncompleteMediaWidget::class,
+            ExpiredDocumentsWidget::class,
+            ExpiringSoonDocumentsWidget::class,
         ];
     }
 }

@@ -2,14 +2,16 @@
 
 namespace App\Filament\Pages;
 
+use App\Enums\DocumentVerificationStatus;
+use App\Enums\MediaVerificationStatus;
 use App\Exports\MediaExport;
 use App\Exports\VerificationExport;
 use App\Models\DocumentType;
 use App\Models\Media;
 use App\Models\MediaCategory;
 use App\Models\MediaDocument;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -44,22 +46,31 @@ class ReportsPage extends Page implements HasForms
     }
 
     public ?string $partnerStatus = 'all';
+
     public ?int $partnerCategoryId = null;
-    
+
     // New Advanced Partner Filters
     public ?int $partnerMinScore = null;
+
     public ?int $partnerMaxScore = null;
+
     public ?int $partnerMinCompleteness = null;
+
     public ?int $partnerMaxCompleteness = null;
+
     public ?string $partnerStartDate = null;
+
     public ?string $partnerEndDate = null;
 
     public ?string $docStatus = 'all';
+
     public ?int $docTypeId = null;
+
     public ?string $docExpiration = 'all';
 
     // New Advanced Document Filters
     public ?string $docExpireStartDate = null;
+
     public ?string $docExpireEndDate = null;
 
     public function partnerFilterForm(Schema $schema): Schema
@@ -213,9 +224,9 @@ class ReportsPage extends Page implements HasForms
     {
         return [
             'total' => Media::count(),
-            'approved' => Media::where('verification_status', \App\Enums\MediaVerificationStatus::APPROVED->value)->count(),
-            'pending' => Media::where('verification_status', \App\Enums\MediaVerificationStatus::PENDING->value)->count(),
-            'revision' => Media::where('verification_status', \App\Enums\MediaVerificationStatus::REVISION->value)->count(),
+            'approved' => Media::where('verification_status', MediaVerificationStatus::APPROVED->value)->count(),
+            'pending' => Media::where('verification_status', MediaVerificationStatus::PENDING->value)->count(),
+            'revision' => Media::where('verification_status', MediaVerificationStatus::REVISION->value)->count(),
         ];
     }
 
@@ -223,8 +234,8 @@ class ReportsPage extends Page implements HasForms
     {
         return [
             'total' => MediaDocument::count(),
-            'pending' => MediaDocument::where('verification_status', \App\Enums\DocumentVerificationStatus::PENDING->value)->count(),
-            'approved' => MediaDocument::where('verification_status', \App\Enums\DocumentVerificationStatus::APPROVED->value)->count(),
+            'pending' => MediaDocument::where('verification_status', DocumentVerificationStatus::PENDING->value)->count(),
+            'approved' => MediaDocument::where('verification_status', DocumentVerificationStatus::APPROVED->value)->count(),
             'expired' => MediaDocument::where('expiration_date', '<', now())->count(),
             'expiring_soon' => MediaDocument::whereBetween('expiration_date', [now(), now()->addDays(30)])->count(),
         ];

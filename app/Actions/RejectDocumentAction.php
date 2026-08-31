@@ -22,16 +22,16 @@ class RejectDocumentAction
         DB::transaction(function () use ($document, $verifierId, $notes) {
             $document->update([
                 'verification_status' => DocumentVerificationStatus::REJECTED,
-                'verifier_id'         => $verifierId,
-                'verified_at'         => now(),
-                'verification_notes'  => $notes,
+                'verifier_id' => $verifierId,
+                'verified_at' => now(),
+                'verification_notes' => $notes,
             ]);
 
             VerificationLog::create([
                 'media_document_id' => $document->id,
-                'user_id'           => $verifierId,
-                'status'            => DocumentVerificationStatus::REJECTED->value,
-                'notes'             => $notes,
+                'user_id' => $verifierId,
+                'status' => DocumentVerificationStatus::REJECTED->value,
+                'notes' => $notes,
             ]);
         });
     }

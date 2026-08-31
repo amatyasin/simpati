@@ -22,16 +22,16 @@ class VerifyDocumentAction
         DB::transaction(function () use ($document, $verifierId, $notes) {
             $document->update([
                 'verification_status' => DocumentVerificationStatus::APPROVED,
-                'verifier_id'         => $verifierId,
-                'verified_at'         => now(),
-                'verification_notes'  => $notes,
+                'verifier_id' => $verifierId,
+                'verified_at' => now(),
+                'verification_notes' => $notes,
             ]);
 
             VerificationLog::create([
                 'media_document_id' => $document->id,
-                'user_id'           => $verifierId,
-                'status'            => DocumentVerificationStatus::APPROVED->value,
-                'notes'             => $notes ?? 'Dokumen disetujui.',
+                'user_id' => $verifierId,
+                'status' => DocumentVerificationStatus::APPROVED->value,
+                'notes' => $notes ?? 'Dokumen disetujui.',
             ]);
         });
     }

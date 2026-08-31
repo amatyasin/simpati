@@ -48,6 +48,7 @@ class UserPolicy
         if ($user->hasRole('media_partner') && $user->id === $model->id) {
             return true;
         }
+
         // Leadership (pimpinan) can view only, not update
         return false;
     }

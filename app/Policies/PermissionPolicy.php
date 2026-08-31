@@ -2,9 +2,9 @@
 
 namespace App\Policies;
 
-use Spatie\Permission\Models\Permission;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Spatie\Permission\Models\Permission;
 
 class PermissionPolicy
 {
@@ -29,9 +29,28 @@ class PermissionPolicy
     }
 
     // Read‑only UI – disallow all modifications
-    public function create(User $user): bool { return false; }
-    public function update(User $user, Permission $permission): bool { return false; }
-    public function delete(User $user, Permission $permission): bool { return false; }
-    public function restore(User $user, Permission $permission): bool { return false; }
-    public function forceDelete(User $user, Permission $permission): bool { return false; }
+    public function create(User $user): bool
+    {
+        return false;
+    }
+
+    public function update(User $user, Permission $permission): bool
+    {
+        return false;
+    }
+
+    public function delete(User $user, Permission $permission): bool
+    {
+        return false;
+    }
+
+    public function restore(User $user, Permission $permission): bool
+    {
+        return false;
+    }
+
+    public function forceDelete(User $user, Permission $permission): bool
+    {
+        return false;
+    }
 }

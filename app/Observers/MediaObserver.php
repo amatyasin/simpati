@@ -2,7 +2,9 @@
 
 namespace App\Observers;
 
+use App\Enums\MediaVerificationStatus;
 use App\Models\Media;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class MediaObserver
@@ -14,7 +16,7 @@ class MediaObserver
     public function creating(Media $media): void
     {
         if (empty($media->verification_status)) {
-            $media->verification_status = \App\Enums\MediaVerificationStatus::DRAFT;
+            $media->verification_status = MediaVerificationStatus::DRAFT;
         }
     }
 
@@ -24,7 +26,7 @@ class MediaObserver
      */
     public function deleting(Media $media): void
     {
-        \Illuminate\Support\Facades\DB::transaction(function () use ($media) {
+        DB::transaction(function () use ($media) {
             $media->mediaDocuments()->each(function ($doc) {
                 $doc->delete();
             });
@@ -58,7 +60,7 @@ class MediaObserver
         } catch (\Throwable $e) {
             Log::error('MediaObserver: Error during forceDeleted cleanup', [
                 'media_id' => $media->id,
-                'error'    => $e->getMessage(),
+                'error' => $e->getMessage(),
             ]);
         }
     }

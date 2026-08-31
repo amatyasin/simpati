@@ -33,7 +33,7 @@ class Login extends BaseLogin
 
         $validator = validator(
             ['turnstile' => $turnstileResponse],
-            ['turnstile' => [new TurnstileRule()]]
+            ['turnstile' => [new TurnstileRule]]
         );
 
         if ($validator->fails()) {

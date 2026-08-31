@@ -1,15 +1,15 @@
 <?php
 
+use App\Actions\RejectDocumentAction;
+use App\Actions\RequestRevisionAction;
+use App\Actions\VerifyDocumentAction;
+use App\Enums\DocumentVerificationStatus;
+use App\Models\DocumentType;
 use App\Models\Media;
 use App\Models\MediaCategory;
 use App\Models\MediaDocument;
-use App\Models\DocumentType;
 use App\Models\User;
 use App\Models\VerificationLog;
-use App\Actions\VerifyDocumentAction;
-use App\Actions\RejectDocumentAction;
-use App\Actions\RequestRevisionAction;
-use App\Enums\DocumentVerificationStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -52,7 +52,7 @@ beforeEach(function () {
 
 test('VerifyDocumentAction updates document status, creates log and recalculates score', function () {
     $action = app(VerifyDocumentAction::class);
-    
+
     $action->execute($this->document, $this->verifier->id, 'Dokumen lengkap dan valid');
 
     // Fresh instance
@@ -78,7 +78,7 @@ test('VerifyDocumentAction updates document status, creates log and recalculates
 
 test('RejectDocumentAction updates document status, creates log and recalculates score', function () {
     $action = app(RejectDocumentAction::class);
-    
+
     $action->execute($this->document, $this->verifier->id, 'Dokumen palsu');
 
     $this->document->refresh();
@@ -102,7 +102,7 @@ test('RejectDocumentAction updates document status, creates log and recalculates
 
 test('RequestRevisionAction updates document status, creates log and recalculates score', function () {
     $action = app(RequestRevisionAction::class);
-    
+
     $action->execute($this->document, $this->verifier->id, 'Tolong upload scan yang lebih jelas');
 
     $this->document->refresh();

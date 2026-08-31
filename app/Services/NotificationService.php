@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Enums\DocumentVerificationStatus;
 use App\Models\Media;
 use App\Models\MediaDocument;
+use App\Models\User;
+use Carbon\Carbon;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 
@@ -26,7 +28,7 @@ class NotificationService
         }
 
         $docTypeName = $document->documentType?->name ?? 'Dokumen';
-        $status      = $document->verification_status;
+        $status = $document->verification_status;
 
         [$title, $body, $type] = match ($status) {
             DocumentVerificationStatus::APPROVED => [
@@ -58,17 +60,17 @@ class NotificationService
 
             match ($type) {
                 'success' => $notification->success(),
-                'danger'  => $notification->danger(),
+                'danger' => $notification->danger(),
                 'warning' => $notification->warning(),
-                default   => $notification->info(),
+                default => $notification->info(),
             };
 
             $notification->sendToDatabase($user);
         } catch (\Throwable $e) {
             Log::error('NotificationService: Failed to send database notification', [
-                'user_id'     => $user->id,
+                'user_id' => $user->id,
                 'document_id' => $document->id,
-                'error'       => $e->getMessage(),
+                'error' => $e->getMessage(),
             ]);
         }
     }
@@ -78,10 +80,10 @@ class NotificationService
      */
     public function notifyAdminsOfNewDocument(MediaDocument $document): void
     {
-        $media       = $document->mediaPartner;
+        $media = $document->mediaPartner;
         $docTypeName = $document->documentType?->name ?? 'Dokumen';
 
-        $adminUsers = \App\Models\User::role(['super_admin', 'diskominfo_admin'])->get();
+        $adminUsers = User::role(['super_admin', 'diskominfo_admin'])->get();
 
         foreach ($adminUsers as $admin) {
             try {
@@ -92,9 +94,9 @@ class NotificationService
                     ->sendToDatabase($admin);
             } catch (\Throwable $e) {
                 Log::error('NotificationService: Failed to notify admin', [
-                    'admin_id'    => $admin->id,
+                    'admin_id' => $admin->id,
                     'document_id' => $document->id,
-                    'error'       => $e->getMessage(),
+                    'error' => $e->getMessage(),
                 ]);
             }
         }
@@ -120,14 +122,14 @@ class NotificationService
         try {
             Notification::make()
                 ->title('Dokumen Kedaluwarsa 🚨')
-                ->body("Dokumen **{$docTypeName}** (No: {$document->document_number}) masa berlakunya telah kedaluwarsa pada " . \Carbon\Carbon::parse($document->expiration_date)->format('d M Y') . ".")
+                ->body("Dokumen **{$docTypeName}** (No: {$document->document_number}) masa berlakunya telah kedaluwarsa pada ".Carbon::parse($document->expiration_date)->format('d M Y').'.')
                 ->danger()
                 ->sendToDatabase($user);
         } catch (\Throwable $e) {
             Log::error('NotificationService: Failed to send document expired notification', [
-                'user_id'     => $user->id,
+                'user_id' => $user->id,
                 'document_id' => $document->id,
-                'error'       => $e->getMessage(),
+                'error' => $e->getMessage(),
             ]);
         }
     }
@@ -150,9 +152,9 @@ class NotificationService
                 ->sendToDatabase($user);
         } catch (\Throwable $e) {
             Log::error('NotificationService: Failed to send profile incomplete notification', [
-                'user_id'  => $media->user_id,
+                'user_id' => $media->user_id,
                 'media_id' => $media->id,
-                'error'    => $e->getMessage(),
+                'error' => $e->getMessage(),
             ]);
         }
     }

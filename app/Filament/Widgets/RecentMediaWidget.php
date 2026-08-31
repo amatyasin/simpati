@@ -48,7 +48,7 @@ class RecentMediaWidget extends BaseWidget
                     ->color(fn (int $state): string => match (true) {
                         $state >= 80 => 'success',
                         $state >= 50 => 'warning',
-                        default      => 'danger',
+                        default => 'danger',
                     }),
 
                 TextColumn::make('verification_status')
@@ -56,17 +56,17 @@ class RecentMediaWidget extends BaseWidget
                     ->badge()
                     ->color(fn (MediaVerificationStatus $state): string => match ($state) {
                         MediaVerificationStatus::APPROVED => 'success',
-                        MediaVerificationStatus::PENDING  => 'warning',
+                        MediaVerificationStatus::PENDING => 'warning',
                         MediaVerificationStatus::REVISION => 'info',
                         MediaVerificationStatus::REJECTED => 'danger',
-                        default                           => 'gray',
+                        default => 'gray',
                     })
                     ->formatStateUsing(fn (MediaVerificationStatus $state): string => match ($state) {
                         MediaVerificationStatus::APPROVED => 'Terverifikasi',
-                        MediaVerificationStatus::PENDING  => 'Menunggu',
+                        MediaVerificationStatus::PENDING => 'Menunggu',
                         MediaVerificationStatus::REVISION => 'Revisi',
                         MediaVerificationStatus::REJECTED => 'Ditolak',
-                        MediaVerificationStatus::DRAFT    => 'Draft',
+                        MediaVerificationStatus::DRAFT => 'Draft',
                     }),
 
                 TextColumn::make('created_at')

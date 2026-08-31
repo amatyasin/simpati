@@ -6,6 +6,7 @@ use App\Enums\MediaVerificationStatus;
 use App\Models\DocumentType;
 use App\Models\Media;
 use App\Models\MediaCategory;
+use App\Models\MediaDocument;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\DB;
@@ -21,14 +22,14 @@ class StatsOverviewWidget extends BaseWidget
         if ($user && $user->hasRole('media_partner')) {
             $mediaId = Media::where('user_id', $user->id)->value('id');
             $media = Media::where('user_id', $user->id)->first();
-            
-            $totalDocs = \App\Models\MediaDocument::where('media_id', $mediaId)->count();
-            $pendingDocs = \App\Models\MediaDocument::where('media_id', $mediaId)->pending()->count();
-            $expiredDocs = \App\Models\MediaDocument::where('media_id', $mediaId)->expired()->count();
+
+            $totalDocs = MediaDocument::where('media_id', $mediaId)->count();
+            $pendingDocs = MediaDocument::where('media_id', $mediaId)->pending()->count();
+            $expiredDocs = MediaDocument::where('media_id', $mediaId)->expired()->count();
             $completeness = $media?->completeness_percentage ?? 0;
 
             return [
-                Stat::make('Kelengkapan Profil', $completeness . '%')
+                Stat::make('Kelengkapan Profil', $completeness.'%')
                     ->description('Persentase kelengkapan data')
                     ->descriptionIcon('heroicon-o-check-badge')
                     ->color($completeness >= 80 ? 'success' : 'warning')

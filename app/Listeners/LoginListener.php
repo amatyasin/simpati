@@ -2,11 +2,10 @@
 
 namespace App\Listeners;
 
-use App\Models\LoginActivity;
 use App\Enums\LoginStatus;
+use App\Models\LoginActivity;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\DB;
 
 class LoginListener
 {

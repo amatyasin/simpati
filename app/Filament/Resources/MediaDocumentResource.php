@@ -7,8 +7,10 @@ use App\Actions\RequestRevisionAction;
 use App\Actions\VerifyDocumentAction;
 use App\Enums\DocumentVerificationStatus;
 use App\Filament\Resources\MediaDocumentResource\Pages;
+use App\Filament\Resources\MediaDocumentResource\RelationManagers\VerificationLogsRelationManager;
+use App\Models\Media;
 use App\Models\MediaDocument;
-use App\Models\VerificationLog;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -27,15 +29,17 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Utilities\Get;
-use Filament\Actions\Action;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Unique;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class MediaDocumentResource extends Resource
 {
@@ -85,7 +89,7 @@ class MediaDocumentResource extends Resource
                         ->searchable()
                         ->preload()
                         ->required()
-                        ->default(fn () => auth()->user()?->hasRole('media_partner') ? \App\Models\Media::where('user_id', auth()->id())->value('id') : null)
+                        ->default(fn () => auth()->user()?->hasRole('media_partner') ? Media::where('user_id', auth()->id())->value('id') : null)
                         ->disabled(fn () => ! auth()->user()?->hasAnyRole(['super_admin', 'diskominfo_admin']))
                         ->dehydrated(),
 
@@ -101,7 +105,7 @@ class MediaDocumentResource extends Resource
                         ->unique(
                             table: 'media_documents',
                             column: 'document_type_id',
-                            modifyRuleUsing: function (\Illuminate\Validation\Rules\Unique $rule, Get $get, ?MediaDocument $record) {
+                            modifyRuleUsing: function (Unique $rule, Get $get, ?MediaDocument $record) {
                                 return $rule->where('media_id', $get('media_id'))
                                     ->whereNull('deleted_at')
                                     ->ignore($record?->id);
@@ -141,10 +145,11 @@ class MediaDocumentResource extends Resource
                             'image/png',
                         ])
                         ->maxSize(10240) // 10MB
-                        ->getUploadedFileNameForStorageUsing(function (\Livewire\Features\SupportFileUploads\TemporaryUploadedFile $file): string {
+                        ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file): string {
                             $extension = $file->getClientOriginalExtension();
-                            $baseName = \Illuminate\Support\Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
-                            return "doc_" . time() . "_" . $baseName . "." . $extension;
+                            $baseName = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+
+                            return 'doc_'.time().'_'.$baseName.'.'.$extension;
                         })
                         ->columnSpanFull(),
                 ])->columns(2),
@@ -181,14 +186,14 @@ class MediaDocumentResource extends Resource
                     ->label('Kedaluwarsa')
                     ->date('d M Y')
                     ->color(fn (MediaDocument $record) => match (true) {
-                        $record->is_expired       => 'danger',
+                        $record->is_expired => 'danger',
                         $record->is_expiring_soon => 'warning',
-                        default                   => 'gray',
+                        default => 'gray',
                     })
                     ->description(fn (MediaDocument $record) => match (true) {
-                        $record->is_expired       => '⚠️ Kedaluwarsa',
+                        $record->is_expired => '⚠️ Kedaluwarsa',
                         $record->is_expiring_soon => '🔔 Segera Kedaluwarsa',
-                        default                   => 'Aktif',
+                        default => 'Aktif',
                     })
                     ->sortable(),
 
@@ -197,13 +202,13 @@ class MediaDocumentResource extends Resource
                     ->badge()
                     ->color(fn (DocumentVerificationStatus $state): string => match ($state) {
                         DocumentVerificationStatus::APPROVED => 'success',
-                        DocumentVerificationStatus::PENDING  => 'warning',
+                        DocumentVerificationStatus::PENDING => 'warning',
                         DocumentVerificationStatus::REVISION => 'info',
                         DocumentVerificationStatus::REJECTED => 'danger',
                     })
                     ->formatStateUsing(fn (DocumentVerificationStatus $state): string => match ($state) {
                         DocumentVerificationStatus::APPROVED => 'Disetujui ✅',
-                        DocumentVerificationStatus::PENDING  => 'Menunggu ⏳',
+                        DocumentVerificationStatus::PENDING => 'Menunggu ⏳',
                         DocumentVerificationStatus::REVISION => 'Revisi ✏️',
                         DocumentVerificationStatus::REJECTED => 'Ditolak ❌',
                     })
@@ -244,7 +249,7 @@ class MediaDocumentResource extends Resource
                     ->mutateFormDataUsing(function (array $data): array {
                         if (auth()->user()?->hasRole('media_partner')) {
                             $data['verification_status'] = DocumentVerificationStatus::PENDING->value;
-                            $data['verification_notes']  = null;
+                            $data['verification_notes'] = null;
                         }
 
                         return $data;
@@ -337,13 +342,13 @@ class MediaDocumentResource extends Resource
                         ->badge()
                         ->color(fn (DocumentVerificationStatus $state): string => match ($state) {
                             DocumentVerificationStatus::APPROVED => 'success',
-                            DocumentVerificationStatus::PENDING  => 'warning',
+                            DocumentVerificationStatus::PENDING => 'warning',
                             DocumentVerificationStatus::REVISION => 'info',
                             DocumentVerificationStatus::REJECTED => 'danger',
                         })
                         ->formatStateUsing(fn (DocumentVerificationStatus $state): string => match ($state) {
                             DocumentVerificationStatus::APPROVED => 'Disetujui',
-                            DocumentVerificationStatus::PENDING  => 'Menunggu Verifikasi',
+                            DocumentVerificationStatus::PENDING => 'Menunggu Verifikasi',
                             DocumentVerificationStatus::REVISION => 'Minta Revisi',
                             DocumentVerificationStatus::REJECTED => 'Ditolak',
                         }),
@@ -378,17 +383,17 @@ class MediaDocumentResource extends Resource
     public static function getRelations(): array
     {
         return [
-            \App\Filament\Resources\MediaDocumentResource\RelationManagers\VerificationLogsRelationManager::class,
+            VerificationLogsRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListMediaDocuments::route('/'),
+            'index' => Pages\ListMediaDocuments::route('/'),
             'create' => Pages\CreateMediaDocument::route('/create'),
-            'view'   => Pages\ViewMediaDocument::route('/{record}'),
-            'edit'   => Pages\EditMediaDocument::route('/{record}/edit'),
+            'view' => Pages\ViewMediaDocument::route('/{record}'),
+            'edit' => Pages\EditMediaDocument::route('/{record}/edit'),
         ];
     }
 

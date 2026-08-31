@@ -2,19 +2,21 @@
 
 namespace App\Filament\Resources;
 
-use Spatie\Permission\Models\Permission;
+use App\Filament\Resources\PermissionViewerResource\Pages\ListPermissions;
+use App\Filament\Resources\PermissionViewerResource\Pages\ViewPermission;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\ViewAction;
-use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Pages\ViewRecord;
+use Filament\Tables\Table;
+use Spatie\Permission\Models\Permission;
 
 class PermissionViewerResource extends Resource
 {
     protected static ?string $model = Permission::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-key';
+
     protected static string|\UnitEnum|null $navigationGroup = 'User Management';
 
     public static function form(Schema $schema): Schema
@@ -42,8 +44,8 @@ class PermissionViewerResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => \App\Filament\Resources\PermissionViewerResource\Pages\ListPermissions::route('/'),
-            'view' => \App\Filament\Resources\PermissionViewerResource\Pages\ViewPermission::route('/{record}'),
+            'index' => ListPermissions::route('/'),
+            'view' => ViewPermission::route('/{record}'),
         ];
     }
 }

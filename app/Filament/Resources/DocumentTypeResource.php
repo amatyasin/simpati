@@ -73,7 +73,8 @@ class DocumentTypeResource extends Resource
                         ->required()
                         ->unique(ignoreRecord: true)
                         ->maxLength(50)
-                        ->uppercase()
+                        ->extraInputAttributes(['style' => 'text-transform: uppercase'])
+                        ->dehydrateStateUsing(fn ($state) => $state ? strtoupper($state) : $state)
                         ->helperText('Contoh: PDF, VIDEO, IMAGE'),
 
                     Textarea::make('description')

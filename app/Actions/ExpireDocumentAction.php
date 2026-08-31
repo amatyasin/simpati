@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Enums\DocumentVerificationStatus;
 use App\Models\Media;
 use App\Models\MediaDocument;
+use App\Services\NotificationService;
 
 class ExpireDocumentAction
 {
@@ -30,7 +31,7 @@ class ExpireDocumentAction
             $media = $doc->mediaPartner;
             if ($media) {
                 $this->recalculateScoreAction->execute($media);
-                app(\App\Services\NotificationService::class)->notifyDocumentExpired($doc);
+                app(NotificationService::class)->notifyDocumentExpired($doc);
                 $count++;
             }
         }

@@ -1,13 +1,15 @@
 <?php
 
+use App\Enums\DocumentVerificationStatus;
+use App\Models\DocumentType;
 use App\Models\Media;
 use App\Models\MediaCategory;
 use App\Models\MediaDocument;
-use App\Models\DocumentType;
 use App\Models\User;
-use App\Enums\DocumentVerificationStatus;
-use Illuminate\Support\Str;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 uses(RefreshDatabase::class);
 
@@ -59,14 +61,14 @@ test('the database unique rule blocks duplicate document_type_id per media', fun
     ]);
 
     // 2. Verify the unique constraint validator rejects the duplicate at the Validator level
-    $validator = \Illuminate\Support\Facades\Validator::make(
+    $validator = Validator::make(
         [
             'media_id' => $this->media->id,
             'document_type_id' => $this->docType1->id,
         ],
         [
             'document_type_id' => [
-                \Illuminate\Validation\Rule::unique('media_documents', 'document_type_id')
+                Rule::unique('media_documents', 'document_type_id')
                     ->where('media_id', $this->media->id)
                     ->whereNull('deleted_at'),
             ],
@@ -81,7 +83,7 @@ test('filename normalization slug strips special characters', function () {
     $originalName = 'Test Document @ Name # 123.pdf';
     $extension = pathinfo($originalName, PATHINFO_EXTENSION);
     $baseName = Str::slug(pathinfo($originalName, PATHINFO_FILENAME));
-    $normalized = 'doc_' . time() . '_' . $baseName . '.' . $extension;
+    $normalized = 'doc_'.time().'_'.$baseName.'.'.$extension;
 
     // Str::slug converts @ to 'at' and # is stripped
     expect($baseName)->toContain('test-document');
@@ -98,7 +100,7 @@ test('logo filename normalization slug strips special characters', function () {
     $originalName = 'LOGO Media & News (2026).png';
     $extension = pathinfo($originalName, PATHINFO_EXTENSION);
     $baseName = Str::slug(pathinfo($originalName, PATHINFO_FILENAME));
-    $normalized = 'logo_' . time() . '_' . $baseName . '.' . $extension;
+    $normalized = 'logo_'.time().'_'.$baseName.'.'.$extension;
 
     expect($normalized)->toContain('logo-media-news-2026');
     expect($normalized)->toContain('.png');
@@ -109,7 +111,7 @@ test('logo filename normalization slug strips special characters', function () {
 });
 
 test('accepted MIME types for documents are correctly defined on the model', function () {
-    $doc = new MediaDocument();
+    $doc = new MediaDocument;
     $doc->id = 1;
 
     // The registerMediaCollections method defines accepted MIME types
@@ -135,7 +137,7 @@ test('accepted MIME types for documents are correctly defined on the model', fun
 
     foreach ($testCases as [$mime, $shouldPass]) {
         $result = in_array($mime, $allowedMimes);
-        expect($result)->toBe($shouldPass, "MIME type '$mime' should " . ($shouldPass ? 'pass' : 'fail'));
+        expect($result)->toBe($shouldPass, "MIME type '$mime' should ".($shouldPass ? 'pass' : 'fail'));
     }
 });
 

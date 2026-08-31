@@ -14,4 +14,3 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/media/{media}/merged-pdf/download', [MergedDocumentController::class, 'download'])
         ->name('media.merged-pdf.download');
 });
-

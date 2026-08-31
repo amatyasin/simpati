@@ -2,8 +2,8 @@
 
 namespace App\Listeners;
 
-use App\Models\LoginActivity;
 use App\Enums\LoginStatus;
+use App\Models\LoginActivity;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Support\Facades\Request;
 

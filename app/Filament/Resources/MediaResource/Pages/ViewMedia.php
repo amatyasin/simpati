@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\MediaResource\Pages;
 
+use App\Actions\MergeMediaDocumentsAction;
 use App\Filament\Resources\MediaResource;
 use Filament\Actions;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewMedia extends ViewRecord
@@ -19,23 +21,24 @@ class ViewMedia extends ViewRecord
                 ->color('info')
                 ->action(function ($record): void {
                     if ($record->mediaDocuments()->count() === 0) {
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('Belum ada dokumen yang diunggah.')
                             ->body('Silakan unggah setidaknya 1 dokumen terlebih dahulu.')
                             ->warning()
                             ->send();
+
                         return;
                     }
 
                     try {
-                        app(\App\Actions\MergeMediaDocumentsAction::class)->execute($record);
-                        \Filament\Notifications\Notification::make()
+                        app(MergeMediaDocumentsAction::class)->execute($record);
+                        Notification::make()
                             ->title('PDF gabungan berhasil dibuat.')
                             ->body("Dokumen tersedia: {$record->available_documents_count} dari {$record->total_required_documents_count} dokumen wajib.")
                             ->success()
                             ->send();
                     } catch (\Exception $e) {
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('Gagal menggabungkan PDF')
                             ->body($e->getMessage())
                             ->danger()

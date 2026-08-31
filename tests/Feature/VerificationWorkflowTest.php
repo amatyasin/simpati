@@ -1,18 +1,18 @@
 <?php
 
+use App\Actions\ExpireDocumentAction;
+use App\Actions\RejectDocumentAction;
+use App\Actions\RequestRevisionAction;
+use App\Actions\VerifyDocumentAction;
+use App\Enums\DocumentVerificationStatus;
+use App\Enums\MediaVerificationStatus;
+use App\Models\DocumentType;
 use App\Models\Media;
 use App\Models\MediaCategory;
 use App\Models\MediaDocument;
-use App\Models\DocumentType;
 use App\Models\User;
-use App\Actions\VerifyDocumentAction;
-use App\Actions\RejectDocumentAction;
-use App\Actions\RequestRevisionAction;
-use App\Actions\ExpireDocumentAction;
-use App\Enums\DocumentVerificationStatus;
-use App\Enums\MediaVerificationStatus;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 
 uses(RefreshDatabase::class);
 

@@ -55,11 +55,11 @@ class MediaExport implements FromCollection, ShouldAutoSize, WithHeadings, WithM
         }
 
         if ($this->startDate) {
-            $query->where('created_at', '>=', $this->startDate . ' 00:00:00');
+            $query->where('created_at', '>=', $this->startDate.' 00:00:00');
         }
 
         if ($this->endDate) {
-            $query->where('created_at', '<=', $this->endDate . ' 23:59:59');
+            $query->where('created_at', '<=', $this->endDate.' 23:59:59');
         }
 
         return $query->get();

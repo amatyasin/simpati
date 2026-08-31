@@ -3,25 +3,27 @@
 namespace App\Providers;
 
 use App\Models\DocumentType;
+use App\Models\LoginActivity;
 use App\Models\Media;
 use App\Models\MediaCategory;
 use App\Models\MediaDocument;
 use App\Models\User;
-use App\Models\LoginActivity;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
-use App\Policies\DocumentTypePolicy;
-use App\Policies\MediaCategoryPolicy;
-use App\Policies\MediaPolicy;
-use App\Policies\MediaDocumentPolicy;
-use App\Policies\ActivityLogPolicy;
-use App\Policies\UserPolicy;
-use App\Policies\RolePolicy;
-use App\Policies\PermissionPolicy;
-use App\Policies\LoginActivityPolicy;
 use App\Observers\MediaDocumentObserver;
+use App\Observers\MediaObserver;
+use App\Policies\ActivityLogPolicy;
+use App\Policies\DocumentTypePolicy;
+use App\Policies\LoginActivityPolicy;
+use App\Policies\MediaCategoryPolicy;
+use App\Policies\MediaDocumentPolicy;
+use App\Policies\MediaPolicy;
+use App\Policies\PermissionPolicy;
+use App\Policies\RolePolicy;
+use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,7 +37,7 @@ class AppServiceProvider extends ServiceProvider
         DocumentType::class => DocumentTypePolicy::class,
         Media::class => MediaPolicy::class,
         MediaDocument::class => MediaDocumentPolicy::class,
-        \Spatie\Activitylog\Models\Activity::class => ActivityLogPolicy::class,
+        Activity::class => ActivityLogPolicy::class,
         User::class => UserPolicy::class,
         Role::class => RolePolicy::class,
         Permission::class => PermissionPolicy::class,
@@ -58,8 +60,8 @@ class AppServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         // Register Observers
-        \App\Models\Media::observe(\App\Observers\MediaObserver::class);
-        \App\Models\MediaDocument::observe(MediaDocumentObserver::class);
+        Media::observe(MediaObserver::class);
+        MediaDocument::observe(MediaDocumentObserver::class);
 
         // super_admin bypasses all policy checks
         Gate::before(function ($user, $ability) {

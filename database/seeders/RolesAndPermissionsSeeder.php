@@ -75,15 +75,15 @@ class RolesAndPermissionsSeeder extends Seeder
             // Master Data
             'view_any_media_category', 'view_media_category', 'create_media_category', 'update_media_category', 'delete_media_category', 'restore_media_category',
             'view_any_document_type', 'view_document_type', 'create_document_type', 'update_document_type', 'delete_document_type', 'restore_document_type',
-            
+
             // Media & Documents
             'view_any_media', 'view_media', 'create_media', 'update_media', 'delete_media', 'restore_media',
             'view_any_media_document', 'view_media_document', 'create_media_document', 'update_media_document', 'delete_media_document', 'restore_media_document',
             'verify_media_document',
-            
+
             // Log Monitoring
             'view_any_activity_log', 'view_activity_log',
-            
+
             // Module level permissions
             'view_dashboard',
             'view_reports', 'export_reports',

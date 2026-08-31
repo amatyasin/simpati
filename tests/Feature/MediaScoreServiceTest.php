@@ -1,12 +1,11 @@
 <?php
 
+use App\Enums\DocumentVerificationStatus;
+use App\Models\DocumentType;
 use App\Models\Media;
 use App\Models\MediaCategory;
 use App\Models\MediaDocument;
-use App\Models\DocumentType;
-use App\Models\User;
 use App\Services\MediaScoreService;
-use App\Enums\DocumentVerificationStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -44,7 +43,7 @@ test('media score service calculates completeness based on document weights', fu
         'verification_status' => 'draft',
     ]);
 
-    $service = new MediaScoreService();
+    $service = new MediaScoreService;
 
     // No documents uploaded -> completeness = 0%
     expect($service->calculateCompleteness($media))->toBe(0);
@@ -101,7 +100,7 @@ test('media score service calculates verification score based on approved docume
         'media_category_id' => $category->id,
     ]);
 
-    $service = new MediaScoreService();
+    $service = new MediaScoreService;
 
     // Create SIUP (60% weight) but PENDING status -> verification score = 0%
     $doc1 = MediaDocument::create([
@@ -164,7 +163,7 @@ test('media score service computes ranking score using formula (Verification × 
         'media_category_id' => $category->id,
     ]);
 
-    $service = new MediaScoreService();
+    $service = new MediaScoreService;
 
     // Upload SIUP, not yet approved.
     // Completeness = 70%

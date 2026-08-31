@@ -2,7 +2,7 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\ExpiredDocumentView;
+use App\Models\MediaDocument;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
@@ -17,7 +17,7 @@ class ExpiredDocumentsWidget extends BaseWidget
 
     public function table(Table $table): Table
     {
-        $query = \App\Models\MediaDocument::query()
+        $query = MediaDocument::query()
             ->expired()
             ->with(['mediaPartner', 'documentType'])
             ->orderBy('expiration_date', 'asc');

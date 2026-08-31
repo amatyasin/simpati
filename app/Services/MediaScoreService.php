@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\Media;
-use App\Models\DocumentType;
 use App\Enums\DocumentVerificationStatus;
+use App\Models\DocumentType;
+use App\Models\Media;
 use Illuminate\Support\Collection;
 
 class MediaScoreService

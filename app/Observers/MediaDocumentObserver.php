@@ -27,7 +27,7 @@ class MediaDocumentObserver
             } catch (\Throwable $e) {
                 Log::error('MediaDocumentObserver: Failed to send new document notification to admins', [
                     'document_id' => $mediaDocument->id,
-                    'error'       => $e->getMessage(),
+                    'error' => $e->getMessage(),
                 ]);
             }
         }
@@ -51,7 +51,7 @@ class MediaDocumentObserver
             } catch (\Throwable $e) {
                 Log::error('MediaDocumentObserver: Failed to send notification', [
                     'document_id' => $mediaDocument->id,
-                    'error'       => $e->getMessage(),
+                    'error' => $e->getMessage(),
                 ]);
             }
         }

@@ -2,19 +2,21 @@
 
 namespace App\Filament\Resources;
 
-use Spatie\Permission\Models\Role;
+use App\Filament\Resources\RoleViewerResource\Pages\ListRoles;
+use App\Filament\Resources\RoleViewerResource\Pages\ViewRole;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\ViewAction;
-use App\Filament\Resources\RoleViewerResource\Pages;
-
+use Filament\Tables\Table;
+use Spatie\Permission\Models\Role;
 
 class RoleViewerResource extends Resource
 {
     protected static ?string $model = Role::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shield-check';
+
     protected static string|\UnitEnum|null $navigationGroup = 'User Management';
 
     public static function form(Schema $schema): Schema
@@ -42,8 +44,8 @@ class RoleViewerResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => \App\Filament\Resources\RoleViewerResource\Pages\ListRoles::route('/'),
-            'view' => \App\Filament\Resources\RoleViewerResource\Pages\ViewRole::route('/{record}'),
+            'index' => ListRoles::route('/'),
+            'view' => ViewRole::route('/{record}'),
         ];
     }
 }

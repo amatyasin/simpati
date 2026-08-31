@@ -3,10 +3,11 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ActivityLogResource\Pages;
+use Filament\Actions\ViewAction;
 use Filament\Infolists\Components\KeyValueEntry;
-use Filament\Schemas\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section as InfolistSection;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -60,7 +61,7 @@ class ActivityLogResource extends Resource
                         'created' => 'success',
                         'updated' => 'warning',
                         'deleted' => 'danger',
-                        default   => 'gray',
+                        default => 'gray',
                     })
                     ->sortable(),
 
@@ -97,13 +98,13 @@ class ActivityLogResource extends Resource
                 SelectFilter::make('log_name')
                     ->label('Kategori Log')
                     ->options([
-                        'media_partner'  => 'Mitra Media',
+                        'media_partner' => 'Mitra Media',
                         'media_document' => 'Dokumen Media',
-                        'default'        => 'Default',
+                        'default' => 'Default',
                     ]),
             ])
             ->actions([
-                \Filament\Actions\ViewAction::make(),
+                ViewAction::make(),
             ])
             ->bulkActions([])
             ->defaultSort('created_at', 'desc');
@@ -127,7 +128,7 @@ class ActivityLogResource extends Resource
                             'created' => 'success',
                             'updated' => 'warning',
                             'deleted' => 'danger',
-                            default   => 'gray',
+                            default => 'gray',
                         }),
 
                     TextEntry::make('causer.name')
@@ -175,7 +176,7 @@ class ActivityLogResource extends Resource
     {
         return [
             'index' => Pages\ListActivityLogs::route('/'),
-            'view'  => Pages\ViewActivityLog::route('/{record}'),
+            'view' => Pages\ViewActivityLog::route('/{record}'),
         ];
     }
 }

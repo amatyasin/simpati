@@ -1,13 +1,14 @@
 <?php
 
 use App\Models\User;
-use Spatie\Permission\Models\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+    app(PermissionRegistrar::class)->forgetCachedPermissions();
 
     $this->superAdminRole = Role::create(['name' => 'super_admin']);
     $this->diskominfoAdminRole = Role::create(['name' => 'diskominfo_admin']);
@@ -27,7 +28,7 @@ test('super admin can view activity logs', function () {
     ]);
     $superAdmin->assignRole($this->superAdminRole);
 
-    app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+    app(PermissionRegistrar::class)->forgetCachedPermissions();
 
     $this->actingAs($superAdmin)
         ->get('/admin/activity-logs')
@@ -42,7 +43,7 @@ test('diskominfo admin can view activity logs', function () {
     ]);
     $diskominfoAdmin->assignRole($this->diskominfoAdminRole);
 
-    app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+    app(PermissionRegistrar::class)->forgetCachedPermissions();
 
     $this->actingAs($diskominfoAdmin)
         ->get('/admin/activity-logs')
@@ -57,7 +58,7 @@ test('media partner cannot view activity logs', function () {
     ]);
     $partner->assignRole($this->mediaPartnerRole);
 
-    app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+    app(PermissionRegistrar::class)->forgetCachedPermissions();
 
     $this->actingAs($partner)
         ->get('/admin/activity-logs')

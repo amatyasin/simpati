@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Actions\MergeMediaDocumentsAction;
 use App\Models\Media;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -31,7 +30,7 @@ class MergedDocumentController extends Controller
 
         return response()->file($path, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="SIMPATI_' . $media->id . '_LEGALITAS.pdf"',
+            'Content-Disposition' => 'inline; filename="SIMPATI_'.$media->id.'_LEGALITAS.pdf"',
         ]);
     }
 
@@ -53,7 +52,7 @@ class MergedDocumentController extends Controller
             abort(404, 'Dokumen PDF gabungan tidak ditemukan.');
         }
 
-        return response()->download($path, 'SIMPATI_' . $media->id . '_LEGALITAS.pdf', [
+        return response()->download($path, 'SIMPATI_'.$media->id.'_LEGALITAS.pdf', [
             'Content-Type' => 'application/pdf',
         ]);
     }

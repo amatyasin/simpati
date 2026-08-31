@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Actions\MergeMediaDocumentsAction;
 use App\Actions\RecalculateMediaScoreAction;
 use App\Enums\MediaVerificationStatus;
 use App\Exports\MediaExport;
@@ -9,7 +10,7 @@ use App\Filament\Resources\MediaResource\Pages;
 use App\Filament\Resources\MediaResource\RelationManagers\MediaDocumentsRelationManager;
 use App\Filament\Resources\MediaResource\RelationManagers\VerificationLogsRelationManager;
 use App\Models\Media;
-use App\Services\MediaScoreService;
+use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -40,6 +41,9 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Maatwebsite\Excel\Facades\Excel;
 
 class MediaResource extends Resource
@@ -141,12 +145,13 @@ class MediaResource extends Resource
                                     ->minLength(8),
                             ])
                             ->createOptionUsing(function (array $data): int {
-                                $user = \App\Models\User::create([
+                                $user = User::create([
                                     'name' => $data['name'],
                                     'email' => $data['email'],
-                                    'password' => \Illuminate\Support\Facades\Hash::make($data['password']),
+                                    'password' => Hash::make($data['password']),
                                 ]);
                                 $user->assignRole('media_partner');
+
                                 return $user->id;
                             })
                             ->disabled(fn () => ! auth()->user()?->hasAnyRole(['super_admin', 'diskominfo_admin']))
@@ -209,10 +214,11 @@ class MediaResource extends Resource
                             ->imageEditor()
                             ->imageEditorAspectRatios(['1:1'])
                             ->maxSize(2048)
-                            ->getUploadedFileNameForStorageUsing(function (\Livewire\Features\SupportFileUploads\TemporaryUploadedFile $file): string {
+                            ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file): string {
                                 $extension = $file->getClientOriginalExtension();
-                                $baseName = \Illuminate\Support\Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
-                                return "logo_" . time() . "_" . $baseName . "." . $extension;
+                                $baseName = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+
+                                return 'logo_'.time().'_'.$baseName.'.'.$extension;
                             })
                             ->helperText('Format: JPG, PNG, WebP. Maks. 2 MB.'),
                     ]),
@@ -279,23 +285,23 @@ class MediaResource extends Resource
 
                 TextColumn::make('completeness_percentage')
                     ->label('Kelengkapan')
-                    ->formatStateUsing(fn ($state) => $state . '%')
+                    ->formatStateUsing(fn ($state) => $state.'%')
                     ->badge()
                     ->color(fn (int $state): string => match (true) {
                         $state >= 80 => 'success',
                         $state >= 50 => 'warning',
-                        default      => 'danger',
+                        default => 'danger',
                     })
                     ->sortable(),
 
                 TextColumn::make('verification_score')
                     ->label('Skor Verifikasi')
-                    ->formatStateUsing(fn ($state) => $state . '%')
+                    ->formatStateUsing(fn ($state) => $state.'%')
                     ->badge()
                     ->color(fn (int $state): string => match (true) {
                         $state >= 80 => 'success',
                         $state >= 50 => 'warning',
-                        default      => 'danger',
+                        default => 'danger',
                     })
                     ->sortable(),
 
@@ -304,17 +310,17 @@ class MediaResource extends Resource
                     ->badge()
                     ->color(fn (MediaVerificationStatus $state): string => match ($state) {
                         MediaVerificationStatus::APPROVED => 'success',
-                        MediaVerificationStatus::PENDING  => 'warning',
+                        MediaVerificationStatus::PENDING => 'warning',
                         MediaVerificationStatus::REVISION => 'info',
                         MediaVerificationStatus::REJECTED => 'danger',
-                        default                           => 'gray',
+                        default => 'gray',
                     })
                     ->formatStateUsing(fn (MediaVerificationStatus $state): string => match ($state) {
                         MediaVerificationStatus::APPROVED => 'Terverifikasi',
-                        MediaVerificationStatus::PENDING  => 'Menunggu Verifikasi',
+                        MediaVerificationStatus::PENDING => 'Menunggu Verifikasi',
                         MediaVerificationStatus::REVISION => 'Butuh Revisi',
                         MediaVerificationStatus::REJECTED => 'Ditolak',
-                        MediaVerificationStatus::DRAFT    => 'Draft',
+                        MediaVerificationStatus::DRAFT => 'Draft',
                     })
                     ->sortable(),
 
@@ -361,11 +367,12 @@ class MediaResource extends Resource
                                 ->body('Silakan unggah setidaknya 1 dokumen terlebih dahulu.')
                                 ->warning()
                                 ->send();
+
                             return;
                         }
 
                         try {
-                            app(\App\Actions\MergeMediaDocumentsAction::class)->execute($record);
+                            app(MergeMediaDocumentsAction::class)->execute($record);
                             Notification::make()
                                 ->title('PDF gabungan berhasil dibuat.')
                                 ->body("Dokumen tersedia: {$record->available_documents_count} dari {$record->total_required_documents_count} dokumen wajib.")
@@ -415,7 +422,7 @@ class MediaResource extends Resource
                     ->visible(fn () => auth()->user()?->hasAnyRole(['super_admin', 'diskominfo_admin', 'leadership']))
                     ->action(fn (Media $record) => Excel::download(
                         new MediaExport('all'),
-                        'mitra-media-' . now()->format('Ymd-His') . '.xlsx'
+                        'mitra-media-'.now()->format('Ymd-His').'.xlsx'
                     )),
 
                 DeleteAction::make(),
@@ -470,37 +477,37 @@ class MediaResource extends Resource
                         ->badge()
                         ->color(fn (MediaVerificationStatus $state): string => match ($state) {
                             MediaVerificationStatus::APPROVED => 'success',
-                            MediaVerificationStatus::PENDING  => 'warning',
+                            MediaVerificationStatus::PENDING => 'warning',
                             MediaVerificationStatus::REVISION => 'info',
                             MediaVerificationStatus::REJECTED => 'danger',
-                            default                           => 'gray',
+                            default => 'gray',
                         })
                         ->formatStateUsing(fn (MediaVerificationStatus $state): string => match ($state) {
                             MediaVerificationStatus::APPROVED => 'Terverifikasi',
-                            MediaVerificationStatus::PENDING  => 'Menunggu Verifikasi',
+                            MediaVerificationStatus::PENDING => 'Menunggu Verifikasi',
                             MediaVerificationStatus::REVISION => 'Butuh Revisi',
                             MediaVerificationStatus::REJECTED => 'Ditolak',
-                            MediaVerificationStatus::DRAFT    => 'Draft',
+                            MediaVerificationStatus::DRAFT => 'Draft',
                         }),
 
                     TextEntry::make('completeness_percentage')
                         ->label('Kelengkapan Dokumen')
-                        ->formatStateUsing(fn ($state) => $state . '%')
+                        ->formatStateUsing(fn ($state) => $state.'%')
                         ->badge()
                         ->color(fn (int $state): string => match (true) {
                             $state >= 80 => 'success',
                             $state >= 50 => 'warning',
-                            default      => 'danger',
+                            default => 'danger',
                         }),
 
                     TextEntry::make('verification_score')
                         ->label('Skor Verifikasi')
-                        ->formatStateUsing(fn ($state) => $state . '%')
+                        ->formatStateUsing(fn ($state) => $state.'%')
                         ->badge()
                         ->color(fn (int $state): string => match (true) {
                             $state >= 80 => 'success',
                             $state >= 50 => 'warning',
-                            default      => 'danger',
+                            default => 'danger',
                         }),
 
                     TextEntry::make('user.name')
@@ -595,10 +602,10 @@ class MediaResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListMedia::route('/'),
+            'index' => Pages\ListMedia::route('/'),
             'create' => Pages\CreateMedia::route('/create'),
-            'view'   => Pages\ViewMedia::route('/{record}'),
-            'edit'   => Pages\EditMedia::route('/{record}/edit'),
+            'view' => Pages\ViewMedia::route('/{record}'),
+            'edit' => Pages\EditMedia::route('/{record}/edit'),
         ];
     }
 

@@ -2,32 +2,31 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\User;
 use App\Enums\UserStatus;
-use Filament\Forms;
-use Filament\Schemas\Schema;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
-
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
+use App\Filament\Resources\UserResource\Pages\CreateUser;
+use App\Filament\Resources\UserResource\Pages\EditUser;
+use App\Filament\Resources\UserResource\Pages\ListUsers;
+use App\Filament\Resources\UserResource\Pages\ViewUser;
+use App\Models\User;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Toggle;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Actions\Action as FilamentAction;
-use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Pages\CreateRecord;
-use Filament\Resources\Pages\EditRecord;
-use Filament\Resources\Pages\ViewRecord;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
 
 class UserResource extends Resource
 {
@@ -39,7 +38,7 @@ class UserResource extends Resource
     {
         return $schema
             ->schema([
-                \Filament\Schemas\Components\Section::make('Informasi Pengguna')
+                Section::make('Informasi Pengguna')
                     ->icon('heroicon-o-user')
                     ->description('Detail profil dan kredensial pengguna sistem.')
                     ->schema([
@@ -110,7 +109,7 @@ class UserResource extends Resource
                             ->required(),
                     ])->columns(2),
 
-                \Filament\Schemas\Components\Section::make('Aktivitas Login & System')
+                Section::make('Aktivitas Login & System')
                     ->icon('heroicon-o-clock')
                     ->schema([
                         DateTimePicker::make('last_login_at')
@@ -183,52 +182,52 @@ class UserResource extends Resource
     public static function infolist(Schema $schema): Schema
     {
         return $schema->schema([
-            \Filament\Schemas\Components\Section::make('Informasi Detail Pengguna')
+            Section::make('Informasi Detail Pengguna')
                 ->icon('heroicon-o-user')
                 ->schema([
-                    \Filament\Infolists\Components\ImageEntry::make('avatar')
+                    ImageEntry::make('avatar')
                         ->label('Foto / Avatar')
                         ->circular(),
 
-                    \Filament\Infolists\Components\TextEntry::make('name')
+                    TextEntry::make('name')
                         ->label('Nama Lengkap')
                         ->weight('bold'),
 
-                    \Filament\Infolists\Components\TextEntry::make('email')
+                    TextEntry::make('email')
                         ->label('Email'),
 
-                    \Filament\Infolists\Components\TextEntry::make('phone')
+                    TextEntry::make('phone')
                         ->label('Nomor Telepon')
                         ->placeholder('—'),
 
-                    \Filament\Infolists\Components\TextEntry::make('roles.name')
+                    TextEntry::make('roles.name')
                         ->label('Peran / Role')
                         ->badge()
                         ->color('primary')
                         ->placeholder('—'),
 
-                    \Filament\Infolists\Components\TextEntry::make('status')
+                    TextEntry::make('status')
                         ->label('Status Akun')
                         ->badge()
                         ->formatStateUsing(fn (?UserStatus $state): string => $state ? ucfirst($state->value) : '—')
                         ->color(fn (?UserStatus $state): string => match ($state) {
-                            UserStatus::Pending  => 'warning',
-                            UserStatus::Active   => 'success',
+                            UserStatus::Pending => 'warning',
+                            UserStatus::Active => 'success',
                             UserStatus::Inactive => 'danger',
-                            UserStatus::Locked   => 'secondary',
-                            default              => 'gray',
+                            UserStatus::Locked => 'secondary',
+                            default => 'gray',
                         }),
 
-                    \Filament\Infolists\Components\TextEntry::make('last_login_at')
+                    TextEntry::make('last_login_at')
                         ->label('Terakhir Login')
                         ->dateTime('d M Y H:i:s')
                         ->placeholder('Belum Pernah Login'),
 
-                    \Filament\Infolists\Components\TextEntry::make('last_login_ip')
+                    TextEntry::make('last_login_ip')
                         ->label('IP Terakhir')
                         ->placeholder('—'),
 
-                    \Filament\Infolists\Components\TextEntry::make('created_at')
+                    TextEntry::make('created_at')
                         ->label('Terdaftar Pada')
                         ->dateTime('d M Y H:i'),
                 ])->columns(4),
@@ -238,10 +237,10 @@ class UserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => \App\Filament\Resources\UserResource\Pages\ListUsers::route('/'),
-            'create' => \App\Filament\Resources\UserResource\Pages\CreateUser::route('/create'),
-            'edit' => \App\Filament\Resources\UserResource\Pages\EditUser::route('/{record}/edit'),
-            'view' => \App\Filament\Resources\UserResource\Pages\ViewUser::route('/{record}'),
+            'index' => ListUsers::route('/'),
+            'create' => CreateUser::route('/create'),
+            'edit' => EditUser::route('/{record}/edit'),
+            'view' => ViewUser::route('/{record}'),
         ];
     }
 }

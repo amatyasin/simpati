@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\MediaDocumentResource\RelationManagers;
 
 use App\Enums\DocumentVerificationStatus;
-use App\Models\VerificationLog;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -34,13 +33,13 @@ class VerificationLogsRelationManager extends RelationManager
                     ->badge()
                     ->color(fn (DocumentVerificationStatus $state): string => match ($state) {
                         DocumentVerificationStatus::APPROVED => 'success',
-                        DocumentVerificationStatus::PENDING  => 'warning',
+                        DocumentVerificationStatus::PENDING => 'warning',
                         DocumentVerificationStatus::REVISION => 'info',
                         DocumentVerificationStatus::REJECTED => 'danger',
                     })
                     ->formatStateUsing(fn (DocumentVerificationStatus $state): string => match ($state) {
                         DocumentVerificationStatus::APPROVED => 'Disetujui',
-                        DocumentVerificationStatus::PENDING  => 'Menunggu',
+                        DocumentVerificationStatus::PENDING => 'Menunggu',
                         DocumentVerificationStatus::REVISION => 'Revisi',
                         DocumentVerificationStatus::REJECTED => 'Ditolak',
                     }),

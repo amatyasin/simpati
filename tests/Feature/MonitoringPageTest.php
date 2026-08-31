@@ -1,13 +1,14 @@
 <?php
 
 use App\Models\User;
-use Spatie\Permission\Models\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+    app(PermissionRegistrar::class)->forgetCachedPermissions();
 
     $this->superAdminRole = Role::create(['name' => 'super_admin']);
     $this->diskominfoAdminRole = Role::create(['name' => 'diskominfo_admin']);
@@ -23,7 +24,7 @@ test('super admin can view monitoring page', function () {
     ]);
     $superAdmin->assignRole($this->superAdminRole);
 
-    app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+    app(PermissionRegistrar::class)->forgetCachedPermissions();
 
     $this->actingAs($superAdmin)
         ->get('/admin/monitoring-page')
@@ -38,7 +39,7 @@ test('diskominfo admin can view monitoring page', function () {
     ]);
     $diskominfoAdmin->assignRole($this->diskominfoAdminRole);
 
-    app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+    app(PermissionRegistrar::class)->forgetCachedPermissions();
 
     $this->actingAs($diskominfoAdmin)
         ->get('/admin/monitoring-page')
@@ -53,7 +54,7 @@ test('leadership can view monitoring page', function () {
     ]);
     $leadership->assignRole($this->leadershipRole);
 
-    app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+    app(PermissionRegistrar::class)->forgetCachedPermissions();
 
     $this->actingAs($leadership)
         ->get('/admin/monitoring-page')
@@ -68,7 +69,7 @@ test('media partner cannot view monitoring page', function () {
     ]);
     $partner->assignRole($this->mediaPartnerRole);
 
-    app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+    app(PermissionRegistrar::class)->forgetCachedPermissions();
 
     $this->actingAs($partner)
         ->get('/admin/monitoring-page')

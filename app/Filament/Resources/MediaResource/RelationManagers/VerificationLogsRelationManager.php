@@ -55,13 +55,13 @@ class VerificationLogsRelationManager extends RelationManager
                     ->badge()
                     ->color(fn (DocumentVerificationStatus $state): string => match ($state) {
                         DocumentVerificationStatus::APPROVED => 'success',
-                        DocumentVerificationStatus::PENDING  => 'warning',
+                        DocumentVerificationStatus::PENDING => 'warning',
                         DocumentVerificationStatus::REVISION => 'info',
                         DocumentVerificationStatus::REJECTED => 'danger',
                     })
                     ->formatStateUsing(fn (DocumentVerificationStatus $state): string => match ($state) {
                         DocumentVerificationStatus::APPROVED => 'Disetujui',
-                        DocumentVerificationStatus::PENDING  => 'Menunggu',
+                        DocumentVerificationStatus::PENDING => 'Menunggu',
                         DocumentVerificationStatus::REVISION => 'Revisi',
                         DocumentVerificationStatus::REJECTED => 'Ditolak',
                     }),

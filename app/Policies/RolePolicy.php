@@ -2,9 +2,9 @@
 
 namespace App\Policies;
 
-use Spatie\Permission\Models\Role;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Spatie\Permission\Models\Role;
 
 class RolePolicy
 {
@@ -29,9 +29,28 @@ class RolePolicy
     }
 
     // No create, update, delete actions – UI is read‑only
-    public function create(User $user): bool { return false; }
-    public function update(User $user, Role $role): bool { return false; }
-    public function delete(User $user, Role $role): bool { return false; }
-    public function restore(User $user, Role $role): bool { return false; }
-    public function forceDelete(User $user, Role $role): bool { return false; }
+    public function create(User $user): bool
+    {
+        return false;
+    }
+
+    public function update(User $user, Role $role): bool
+    {
+        return false;
+    }
+
+    public function delete(User $user, Role $role): bool
+    {
+        return false;
+    }
+
+    public function restore(User $user, Role $role): bool
+    {
+        return false;
+    }
+
+    public function forceDelete(User $user, Role $role): bool
+    {
+        return false;
+    }
 }
