@@ -173,8 +173,8 @@ class MediaCategoryResource extends Resource
                 TrashedFilter::make(),
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
+                ViewAction::make()->modalWidth('lg'),
+                EditAction::make()->modalWidth('lg'),
                 DeleteAction::make(),
                 RestoreAction::make(),
                 ForceDeleteAction::make(),
@@ -193,6 +193,7 @@ class MediaCategoryResource extends Resource
     {
         return $schema->schema([
             Section::make('Detail Kategori')
+                ->columnSpanFull()
                 ->schema([
                     TextEntry::make('name')
                         ->label('Nama'),
@@ -211,18 +212,18 @@ class MediaCategoryResource extends Resource
                     TextEntry::make('sort_order')
                         ->label('Urutan'),
 
-                    TextEntry::make('description')
-                        ->label('Deskripsi')
-                        ->columnSpanFull(),
-
                     IconEntry::make('is_active')
                         ->label('Status Aktif')
                         ->boolean(),
 
+                    TextEntry::make('description')
+                        ->label('Deskripsi')
+                        ->columnSpanFull(),
+
                     TextEntry::make('created_at')
                         ->label('Dibuat Pada')
                         ->dateTime('d M Y H:i'),
-                ])->columns(3),
+                ])->columns(2),
         ]);
     }
 
@@ -235,9 +236,6 @@ class MediaCategoryResource extends Resource
     {
         return [
             'index' => Pages\ListMediaCategories::route('/'),
-            'create' => Pages\CreateMediaCategory::route('/create'),
-            'view' => Pages\ViewMediaCategory::route('/{record}'),
-            'edit' => Pages\EditMediaCategory::route('/{record}/edit'),
         ];
     }
 

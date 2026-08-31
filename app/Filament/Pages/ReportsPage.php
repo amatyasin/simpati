@@ -33,11 +33,11 @@ class ReportsPage extends Page implements HasForms
 
     protected static ?string $title = 'Laporan & Ekspor Data';
 
-    protected static ?int $navigationSort = 20;
+    protected static ?int $navigationSort = 4;
 
     public static function getNavigationGroup(): ?string
     {
-        return null;
+        return 'Pengaturan & Sistem';
     }
 
     public static function canAccess(): bool

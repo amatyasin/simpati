@@ -22,7 +22,7 @@ class ActivityLogResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return null;
+        return 'Pengaturan & Sistem';
     }
 
     protected static ?string $navigationLabel = 'Activity Logs';
@@ -31,7 +31,7 @@ class ActivityLogResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Log Aktivitas';
 
-    protected static ?int $navigationSort = 50;
+    protected static ?int $navigationSort = 5;
 
     public static function form(Schema $schema): Schema
     {
@@ -104,7 +104,7 @@ class ActivityLogResource extends Resource
                     ]),
             ])
             ->actions([
-                ViewAction::make(),
+                ViewAction::make()->modalWidth('xl'),
             ])
             ->bulkActions([])
             ->defaultSort('created_at', 'desc');
@@ -115,6 +115,7 @@ class ActivityLogResource extends Resource
         return $schema->schema([
             InfolistSection::make('Informasi Utama Log')
                 ->icon('heroicon-o-clipboard-document-list')
+                ->columnSpanFull()
                 ->schema([
                     TextEntry::make('log_name')
                         ->label('Kategori Log')
@@ -151,10 +152,11 @@ class ActivityLogResource extends Resource
 
                     TextEntry::make('description')
                         ->label('Deskripsi Kejadian')
-                        ->columnSpan(2),
-                ])->columns(4),
+                        ->columnSpanFull(),
+                ])->columns(2),
 
             InfolistSection::make('Detail Perubahan Data (Properties)')
+                ->columnSpanFull()
                 ->schema([
                     KeyValueEntry::make('properties.attributes')
                         ->label('Data Baru / Saat Ini')
@@ -176,7 +178,6 @@ class ActivityLogResource extends Resource
     {
         return [
             'index' => Pages\ListActivityLogs::route('/'),
-            'view' => Pages\ViewActivityLog::route('/{record}'),
         ];
     }
 }

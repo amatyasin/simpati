@@ -204,8 +204,8 @@ class DocumentTypeResource extends Resource
                 TrashedFilter::make(),
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
+                ViewAction::make()->modalWidth('xl'),
+                EditAction::make()->modalWidth('xl'),
                 DeleteAction::make(),
                 RestoreAction::make(),
                 ForceDeleteAction::make(),
@@ -224,6 +224,7 @@ class DocumentTypeResource extends Resource
     {
         return $schema->schema([
             Section::make('Detail Tipe Dokumen')
+                ->columnSpanFull()
                 ->schema([
                     TextEntry::make('name')
                         ->label('Nama Tipe'),
@@ -269,7 +270,7 @@ class DocumentTypeResource extends Resource
                     TextEntry::make('created_at')
                         ->label('Dibuat Pada')
                         ->dateTime('d M Y H:i'),
-                ])->columns(3),
+                ])->columns(2),
         ]);
     }
 
@@ -282,9 +283,6 @@ class DocumentTypeResource extends Resource
     {
         return [
             'index' => Pages\ListDocumentTypes::route('/'),
-            'create' => Pages\CreateDocumentType::route('/create'),
-            'view' => Pages\ViewDocumentType::route('/{record}'),
-            'edit' => Pages\EditDocumentType::route('/{record}/edit'),
         ];
     }
 

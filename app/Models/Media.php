@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\MediaPriceStatus;
 use App\Enums\MediaVerificationStatus;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -107,6 +109,65 @@ class Media extends Model implements HasMedia
     {
         return $this->hasMany(MediaDocument::class, 'media_id')
             ->where('verification_status', 'rejected');
+    }
+
+    public function mediaPrices(): HasMany
+    {
+        return $this->hasMany(MediaPrice::class, 'media_id');
+    }
+
+    public function activeMediaPrices(): HasMany
+    {
+        return $this->hasMany(MediaPrice::class, 'media_id')
+            ->where('status', MediaPriceStatus::ACTIVE->value);
+    }
+
+    /**
+     * Get active price for a specific service type at a given date.
+     */
+    public function getActivePriceFor(string $serviceType, ?Carbon $date = null): ?MediaPrice
+    {
+        return $this->mediaPrices()
+            ->where('service_type', $serviceType)
+            ->current($date)
+            ->latest('effective_from')
+            ->first();
+    }
+
+    /**
+     * Get price snapshot array for transaction creation.
+     */
+    public function getPriceSnapshotFor(string $serviceType, ?Carbon $date = null): ?array
+    {
+        $price = $this->getActivePriceFor($serviceType, $date);
+
+        if (! $price) {
+            return null;
+        }
+
+        return [
+            'media_price_id' => $price->id,
+            'service_type' => $price->service_type,
+            'unit_price' => $price->price,
+            'formatted_unit_price' => $price->formatted_price,
+            'unit' => $price->unit,
+            'description' => $price->description,
+            'effective_from' => $price->effective_from?->format('Y-m-d'),
+        ];
+    }
+
+    /**
+     * Resolve active price snapshot purely on server side to prevent client price tampering.
+     */
+    public function resolveServerSidePrice(string $serviceType, ?Carbon $date = null): array
+    {
+        $snapshot = $this->getPriceSnapshotFor($serviceType, $date);
+
+        if (! $snapshot) {
+            throw new \InvalidArgumentException("Tidak ada harga aktif yang berlaku untuk media '{$this->brand_name}' dengan layanan '{$serviceType}'.");
+        }
+
+        return $snapshot;
     }
 
     // -------------------------------------------------------------------------

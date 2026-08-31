@@ -23,13 +23,13 @@ class ManageGeneralSettings extends Page implements HasForms
 
     protected string $view = 'filament.pages.manage-general-settings';
 
-    protected static string|\UnitEnum|null $navigationGroup = null;
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Sistem';
 
     protected static ?string $title = 'Pengaturan Sistem';
 
     protected static ?string $navigationLabel = 'Settings';
 
-    protected static ?int $navigationSort = 100;
+    protected static ?int $navigationSort = 6;
 
     public static function canAccess(): bool
     {
@@ -70,6 +70,7 @@ class ManageGeneralSettings extends Page implements HasForms
                         Textarea::make('address')
                             ->label('Alamat Instansi')
                             ->rows(3)
+                            ->columnSpanFull()
                             ->required(),
                     ])->columns(2),
 

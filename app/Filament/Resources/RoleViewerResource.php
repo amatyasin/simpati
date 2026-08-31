@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\RoleViewerResource\Pages\ListRoles;
-use App\Filament\Resources\RoleViewerResource\Pages\ViewRole;
 use Filament\Actions\ViewAction;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
@@ -19,9 +18,9 @@ class RoleViewerResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shield-check';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Master Data';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Sistem';
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 3;
 
     public static function form(Schema $schema): Schema
     {
@@ -40,7 +39,7 @@ class RoleViewerResource extends Resource
                     ->getStateUsing(fn (Role $record) => $record->permissions->count()),
             ])
             ->actions([
-                ViewAction::make(),
+                ViewAction::make()->modalWidth('lg'),
             ])
             ->bulkActions([]);
     }
@@ -50,6 +49,7 @@ class RoleViewerResource extends Resource
         return $schema->schema([
             Section::make('Detail Role')
                 ->icon('heroicon-o-shield-check')
+                ->columnSpanFull()
                 ->schema([
                     TextEntry::make('name')
                         ->label('Nama Role')
@@ -80,7 +80,6 @@ class RoleViewerResource extends Resource
     {
         return [
             'index' => ListRoles::route('/'),
-            'view' => ViewRole::route('/{record}'),
         ];
     }
 }

@@ -3,10 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enums\UserStatus;
-use App\Filament\Resources\UserResource\Pages\CreateUser;
-use App\Filament\Resources\UserResource\Pages\EditUser;
 use App\Filament\Resources\UserResource\Pages\ListUsers;
-use App\Filament\Resources\UserResource\Pages\ViewUser;
 use App\Models\User;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -169,8 +166,8 @@ class UserResource extends Resource
                     ->relationship('roles', 'name'),
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
+                ViewAction::make()->modalWidth('lg'),
+                EditAction::make()->modalWidth('lg'),
                 DeleteAction::make(),
             ])
             ->bulkActions([
@@ -184,10 +181,12 @@ class UserResource extends Resource
         return $schema->schema([
             Section::make('Informasi Detail Pengguna')
                 ->icon('heroicon-o-user')
+                ->columnSpanFull()
                 ->schema([
                     ImageEntry::make('avatar')
                         ->label('Foto / Avatar')
-                        ->circular(),
+                        ->circular()
+                        ->columnSpanFull(),
 
                     TextEntry::make('name')
                         ->label('Nama Lengkap')
@@ -230,7 +229,7 @@ class UserResource extends Resource
                     TextEntry::make('created_at')
                         ->label('Terdaftar Pada')
                         ->dateTime('d M Y H:i'),
-                ])->columns(4),
+                ])->columns(2),
         ]);
     }
 
@@ -238,9 +237,6 @@ class UserResource extends Resource
     {
         return [
             'index' => ListUsers::route('/'),
-            'create' => CreateUser::route('/create'),
-            'edit' => EditUser::route('/{record}/edit'),
-            'view' => ViewUser::route('/{record}'),
         ];
     }
 }

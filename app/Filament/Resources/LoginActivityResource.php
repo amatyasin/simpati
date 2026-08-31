@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\LoginActivityResource\Pages\ListLoginActivities;
-use App\Filament\Resources\LoginActivityResource\Pages\ViewLoginActivity;
 use App\Models\LoginActivity;
 use Filament\Actions\ViewAction;
 use Filament\Infolists\Components\TextEntry;
@@ -20,9 +19,9 @@ class LoginActivityResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-arrow-right-on-rectangle';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Master Data';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Sistem';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema
     {
@@ -60,7 +59,7 @@ class LoginActivityResource extends Resource
                     }),
             ])
             ->actions([
-                ViewAction::make(),
+                ViewAction::make()->modalWidth('lg'),
             ])
             ->bulkActions([]);
     }
@@ -70,6 +69,7 @@ class LoginActivityResource extends Resource
         return $schema->schema([
             Section::make('Detail Log Login')
                 ->icon('heroicon-o-arrow-right-on-rectangle')
+                ->columnSpanFull()
                 ->schema([
                     TextEntry::make('user.name')
                         ->label('Pengguna')
@@ -108,9 +108,9 @@ class LoginActivityResource extends Resource
 
                     TextEntry::make('user_agent')
                         ->label('User Agent / Browser')
-                        ->columnSpan(3)
+                        ->columnSpanFull()
                         ->placeholder('—'),
-                ])->columns(4),
+                ])->columns(2),
         ]);
     }
 
@@ -118,7 +118,6 @@ class LoginActivityResource extends Resource
     {
         return [
             'index' => ListLoginActivities::route('/'),
-            'view' => ViewLoginActivity::route('/{record}'),
         ];
     }
 }

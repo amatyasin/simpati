@@ -239,8 +239,9 @@ class MediaDocumentResource extends Resource
                 TrashedFilter::make(),
             ])
             ->actions([
-                ViewAction::make(),
+                ViewAction::make()->modalWidth('xl'),
                 EditAction::make()
+                    ->modalWidth('xl')
                     ->visible(fn (MediaDocument $record) => in_array(
                         $record->verification_status?->value,
                         ['pending', 'revision'],
@@ -324,6 +325,7 @@ class MediaDocumentResource extends Resource
         return $schema->schema([
             Section::make('Detail Dokumen Administratif')
                 ->icon('heroicon-o-document-text')
+                ->columnSpanFull()
                 ->schema([
                     TextEntry::make('mediaPartner.brand_name')
                         ->label('Mitra Media')
@@ -376,7 +378,7 @@ class MediaDocumentResource extends Resource
                         ->label('Catatan Verifikator')
                         ->columnSpanFull()
                         ->placeholder('Tidak ada catatan verifikasi.'),
-                ])->columns(4),
+                ])->columns(2),
         ]);
     }
 
@@ -391,9 +393,6 @@ class MediaDocumentResource extends Resource
     {
         return [
             'index' => Pages\ListMediaDocuments::route('/'),
-            'create' => Pages\CreateMediaDocument::route('/create'),
-            'view' => Pages\ViewMediaDocument::route('/{record}'),
-            'edit' => Pages\EditMediaDocument::route('/{record}/edit'),
         ];
     }
 

@@ -8,6 +8,7 @@ use App\Enums\MediaVerificationStatus;
 use App\Exports\MediaExport;
 use App\Filament\Resources\MediaResource\Pages;
 use App\Filament\Resources\MediaResource\RelationManagers\MediaDocumentsRelationManager;
+use App\Filament\Resources\MediaResource\RelationManagers\MediaPricesRelationManager;
 use App\Filament\Resources\MediaResource\RelationManagers\VerificationLogsRelationManager;
 use App\Models\Media;
 use App\Models\User;
@@ -353,8 +354,8 @@ class MediaResource extends Resource
                 TrashedFilter::make(),
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
+                ViewAction::make()->modalWidth('2xl'),
+                EditAction::make()->modalWidth('2xl'),
 
                 Action::make('merge_pdf')
                     ->label(fn (Media $record): string => $record->merged_pdf_url ? 'Generate Ulang PDF' : 'Gabungkan Dokumen PDF')
@@ -543,8 +544,8 @@ class MediaResource extends Resource
                     TextEntry::make('address')
                         ->label('Alamat Kantor')
                         ->placeholder('—')
-                        ->columnSpan(2),
-                ])->columns(4),
+                        ->columnSpanFull(),
+                ])->columns(2),
 
             // Card 2: Deskripsi & System Audit (Compact 2-Column Grid)
             Section::make('Profil Deskripsi & Status Dokumen')
@@ -590,6 +591,7 @@ class MediaResource extends Resource
     public static function getRelations(): array
     {
         return [
+            MediaPricesRelationManager::class,
             MediaDocumentsRelationManager::class,
             VerificationLogsRelationManager::class,
         ];
