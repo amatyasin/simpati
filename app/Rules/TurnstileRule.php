@@ -12,8 +12,9 @@ class TurnstileRule implements ValidationRule
     {
         $secretKey = config('services.turnstile.secret_key');
 
-        // Always pass Cloudflare test/dummy secret keys or when unconfigured
+        // Always pass in testing environment (unless explicitly testing production mode), Cloudflare test keys, or when unconfigured
         if (
+            (app()->environment('testing') && config('app.env') !== 'production') ||
             in_array($secretKey, ['1x0000000000000000000000000000000AA', '0x10000000000000000000000000']) ||
             str_starts_with((string) $secretKey, '0x100000') ||
             empty($secretKey)

@@ -15,7 +15,7 @@ class ListMediaPriceUnits extends ListRecords
         return [
             CreateAction::make()
                 ->label('+ Tambah Satuan Harga')
-                ->modalWidth('xl'),
+                ->modalWidth('lg'),
         ];
     }
 }

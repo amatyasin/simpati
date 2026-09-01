@@ -15,7 +15,7 @@ class ListMediaServiceTypes extends ListRecords
         return [
             CreateAction::make()
                 ->label('+ Tambah Jenis Layanan')
-                ->modalWidth('xl'),
+                ->modalWidth('lg'),
         ];
     }
 }

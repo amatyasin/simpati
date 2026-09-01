@@ -15,7 +15,7 @@ class ListUsers extends ListRecords
         return [
             CreateAction::make()
                 ->label('+ Tambah User Baru')
-                ->modalWidth('lg'),
+                ->modalWidth('2xl'),
         ];
     }
 }

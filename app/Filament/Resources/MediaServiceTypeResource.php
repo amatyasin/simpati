@@ -46,6 +46,7 @@ class MediaServiceTypeResource extends Resource
     {
         return $schema->schema([
             Section::make('Detail Jenis Layanan / Publikasi')
+                ->columnSpanFull()
                 ->schema([
                     TextInput::make('name')
                         ->label('Nama Jenis Layanan')
@@ -98,7 +99,7 @@ class MediaServiceTypeResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->actions([
-                EditAction::make()->modalWidth('xl'),
+                EditAction::make()->modalWidth('lg'),
                 DeleteAction::make(),
             ])
             ->bulkActions([

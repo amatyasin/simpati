@@ -41,6 +41,7 @@ class MediaDocumentsRelationManager extends RelationManager
     {
         return $schema->schema([
             Section::make('Data Dokumen')
+                ->columnSpanFull()
                 ->schema([
                     Select::make('document_type_id')
                         ->label('Tipe Dokumen')
@@ -169,7 +170,7 @@ class MediaDocumentsRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make()
                     ->label('Unggah Dokumen Baru')
-                    ->modalWidth('xl')
+                    ->modalWidth('2xl')
                     ->mutateFormDataUsing(function (array $data): array {
                         $data['verification_status'] = DocumentVerificationStatus::PENDING->value;
                         $data['verifier_id'] = null;
@@ -185,7 +186,7 @@ class MediaDocumentsRelationManager extends RelationManager
             ])
             ->actions([
                 ViewAction::make()
-                    ->modalWidth('xl')
+                    ->modalWidth('2xl')
                     ->infolist(fn (Schema $schema) => $schema->schema([
                         Section::make('Detail Dokumen')
                             ->columnSpanFull()
@@ -211,7 +212,7 @@ class MediaDocumentsRelationManager extends RelationManager
 
                 EditAction::make()
                     ->label('Edit')
-                    ->modalWidth('xl')
+                    ->modalWidth('2xl')
                     ->visible(fn (MediaDocument $record) => in_array(
                         $record->verification_status?->value,
                         ['pending', 'revision'],

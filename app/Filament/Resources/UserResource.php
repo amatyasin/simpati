@@ -38,6 +38,7 @@ class UserResource extends Resource
                 Section::make('Informasi Pengguna')
                     ->icon('heroicon-o-user')
                     ->description('Detail profil dan kredensial pengguna sistem.')
+                    ->columnSpanFull()
                     ->schema([
                         FileUpload::make('avatar')
                             ->id('user_avatar')
@@ -108,6 +109,7 @@ class UserResource extends Resource
 
                 Section::make('Aktivitas Login & System')
                     ->icon('heroicon-o-clock')
+                    ->columnSpanFull()
                     ->schema([
                         DateTimePicker::make('last_login_at')
                             ->id('last_login_at')
@@ -166,8 +168,8 @@ class UserResource extends Resource
                     ->relationship('roles', 'name'),
             ])
             ->actions([
-                ViewAction::make()->modalWidth('lg'),
-                EditAction::make()->modalWidth('lg'),
+                ViewAction::make()->modalWidth('2xl'),
+                EditAction::make()->modalWidth('2xl'),
                 DeleteAction::make(),
             ])
             ->bulkActions([

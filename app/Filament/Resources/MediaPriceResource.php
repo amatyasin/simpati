@@ -75,6 +75,7 @@ class MediaPriceResource extends Resource
 
         return $schema->schema([
             Section::make('Informasi Harga & Media')
+                ->columnSpanFull()
                 ->schema([
                     Select::make('media_id')
                         ->label('Mitra Media')
@@ -287,7 +288,7 @@ class MediaPriceResource extends Resource
                 TrashedFilter::make(),
             ])
             ->actions([
-                ViewAction::make()->modalWidth('xl'),
+                ViewAction::make()->modalWidth('2xl'),
 
                 // -----------------------------------------------------------
                 // Submit Action (Media Partner or Admin)
@@ -353,7 +354,7 @@ class MediaPriceResource extends Resource
                             ->send();
                     }),
 
-                EditAction::make()->modalWidth('xl'),
+                EditAction::make()->modalWidth('2xl'),
                 DeleteAction::make(),
                 RestoreAction::make(),
                 ForceDeleteAction::make(),

@@ -62,6 +62,7 @@ class DocumentTypeResource extends Resource
         return $schema->schema([
             Section::make('Informasi Tipe Dokumen')
                 ->icon('heroicon-o-document-duplicate')
+                ->columnSpanFull()
                 ->schema([
                     TextInput::make('name')
                         ->label('Nama Tipe')
@@ -85,6 +86,7 @@ class DocumentTypeResource extends Resource
 
             Section::make('Konfigurasi File & Bobot Scoring')
                 ->icon('heroicon-o-cog-6-tooth')
+                ->columnSpanFull()
                 ->schema([
                     TagsInput::make('allowed_extensions')
                         ->label('Ekstensi yang Diizinkan')
@@ -204,8 +206,8 @@ class DocumentTypeResource extends Resource
                 TrashedFilter::make(),
             ])
             ->actions([
-                ViewAction::make()->modalWidth('xl'),
-                EditAction::make()->modalWidth('xl'),
+                ViewAction::make()->modalWidth('2xl'),
+                EditAction::make()->modalWidth('2xl'),
                 DeleteAction::make(),
                 RestoreAction::make(),
                 ForceDeleteAction::make(),

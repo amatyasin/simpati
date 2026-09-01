@@ -80,6 +80,7 @@ class MediaDocumentResource extends Resource
             Section::make('Informasi Dokumen')
                 ->description('Detail metadata dokumen administratif media.')
                 ->icon('heroicon-o-document')
+                ->columnSpanFull()
                 ->schema([
                     Select::make('media_id')
                         ->id('doc_media_id')
@@ -239,9 +240,9 @@ class MediaDocumentResource extends Resource
                 TrashedFilter::make(),
             ])
             ->actions([
-                ViewAction::make()->modalWidth('xl'),
+                ViewAction::make()->modalWidth('2xl'),
                 EditAction::make()
-                    ->modalWidth('xl')
+                    ->modalWidth('2xl')
                     ->visible(fn (MediaDocument $record) => in_array(
                         $record->verification_status?->value,
                         ['pending', 'revision'],

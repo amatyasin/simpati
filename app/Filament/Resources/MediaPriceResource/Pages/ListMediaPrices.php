@@ -19,7 +19,7 @@ class ListMediaPrices extends ListRecords
         return [
             CreateAction::make()
                 ->label('+ Tambah Harga Baru')
-                ->modalWidth('xl')
+                ->modalWidth('2xl')
                 ->mutateFormDataUsing(function (array $data): array {
                     if (auth()->user()?->hasRole('media_partner')) {
                         $data['status'] = MediaPriceStatus::DRAFT->value;

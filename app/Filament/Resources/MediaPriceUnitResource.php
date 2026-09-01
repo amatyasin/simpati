@@ -46,6 +46,7 @@ class MediaPriceUnitResource extends Resource
     {
         return $schema->schema([
             Section::make('Detail Satuan Harga')
+                ->columnSpanFull()
                 ->schema([
                     TextInput::make('name')
                         ->label('Nama Satuan')
@@ -98,7 +99,7 @@ class MediaPriceUnitResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->actions([
-                EditAction::make()->modalWidth('xl'),
+                EditAction::make()->modalWidth('lg'),
                 DeleteAction::make(),
             ])
             ->bulkActions([

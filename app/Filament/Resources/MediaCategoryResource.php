@@ -64,6 +64,7 @@ class MediaCategoryResource extends Resource
         return $schema->schema([
             Section::make('Informasi Kategori')
                 ->icon('heroicon-o-tag')
+                ->columnSpanFull()
                 ->schema([
 
                     TextInput::make('name')
@@ -94,6 +95,7 @@ class MediaCategoryResource extends Resource
 
             Section::make('Tampilan & Pengurutan')
                 ->icon('heroicon-o-paint-brush')
+                ->columnSpanFull()
                 ->schema([
                     ColorPicker::make('color')
                         ->id('category_color')
@@ -173,8 +175,8 @@ class MediaCategoryResource extends Resource
                 TrashedFilter::make(),
             ])
             ->actions([
-                ViewAction::make()->modalWidth('lg'),
-                EditAction::make()->modalWidth('lg'),
+                ViewAction::make()->modalWidth('xl'),
+                EditAction::make()->modalWidth('xl'),
                 DeleteAction::make(),
                 RestoreAction::make(),
                 ForceDeleteAction::make(),

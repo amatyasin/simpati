@@ -17,7 +17,7 @@ class ListMediaDocuments extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-                ->modalWidth('xl'),
+                ->modalWidth('2xl'),
         ];
     }
 

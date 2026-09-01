@@ -37,6 +37,7 @@ class MediaPricesRelationManager extends RelationManager
 
         return $schema->schema([
             Section::make('Informasi Harga & Layanan')
+                ->columnSpanFull()
                 ->schema([
                     Select::make('service_type')
                         ->label('Jenis Layanan / Publikasi')
@@ -224,7 +225,7 @@ class MediaPricesRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make()
                     ->label('+ Tambah Harga')
-                    ->modalWidth('xl')
+                    ->modalWidth('2xl')
                     ->visible(fn () => auth()->user()?->can('create', MediaPrice::class))
                     ->mutateFormDataUsing(function (array $data): array {
                         if (auth()->user()?->hasRole('media_partner')) {
@@ -271,7 +272,7 @@ class MediaPricesRelationManager extends RelationManager
             ])
             ->actions([
                 ViewAction::make()
-                    ->modalWidth('xl')
+                    ->modalWidth('2xl')
                     ->infolist(fn (Schema $schema) => $schema->schema([
                         Section::make('Detail Harga Media')
                             ->columnSpanFull()
@@ -362,7 +363,7 @@ class MediaPricesRelationManager extends RelationManager
                     }),
 
                 EditAction::make()
-                    ->modalWidth('xl')
+                    ->modalWidth('2xl')
                     ->visible(fn (MediaPrice $record) => auth()->user()?->can('update', $record))
                     ->before(function (EditAction $action, MediaPrice $record, array $data): void {
                         $status = $data['status'] ?? $record->status?->value;

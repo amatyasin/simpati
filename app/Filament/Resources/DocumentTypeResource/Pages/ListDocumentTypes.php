@@ -13,7 +13,7 @@ class ListDocumentTypes extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->modalWidth('xl'),
+            Actions\CreateAction::make()->modalWidth('2xl'),
         ];
     }
 }

@@ -56,6 +56,7 @@ class ManageGeneralSettings extends Page implements HasForms
             ->schema([
                 Section::make('Informasi Instansi')
                     ->description('Kelola informasi dasar sistem SIMPATI.')
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('site_name')
                             ->label('Nama Sistem/Instansi')
@@ -76,6 +77,7 @@ class ManageGeneralSettings extends Page implements HasForms
 
                 Section::make('Status Sistem')
                     ->description('Atur status ketersediaan sistem.')
+                    ->columnSpanFull()
                     ->schema([
                         Toggle::make('maintenance_mode')
                             ->label('Mode Perbaikan (Maintenance Mode)')
