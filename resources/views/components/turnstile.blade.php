@@ -44,16 +44,22 @@
                 }
             }
 
-            if (!window.turnstileHookRegistered) {
-                window.turnstileHookRegistered = true;
-                document.addEventListener('livewire:init', () => {
+            let registerLivewireHook = () => {
+                if (window.Livewire && !window.turnstileHookRegistered) {
+                    window.turnstileHookRegistered = true;
                     Livewire.hook('request', ({ options }) => {
                         if (window.cfTurnstileToken) {
                             options.headers = options.headers || {};
                             options.headers['X-Turnstile-Token'] = window.cfTurnstileToken;
                         }
                     });
-                });
+                }
+            };
+
+            if (window.Livewire) {
+                registerLivewireHook();
+            } else {
+                document.addEventListener('livewire:init', registerLivewireHook);
             }
         }
     }"
