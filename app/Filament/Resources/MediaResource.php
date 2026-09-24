@@ -156,6 +156,8 @@ class MediaResource extends Resource
                                 return $user->id;
                             })
                             ->disabled(fn () => ! auth()->user()?->hasAnyRole(['super_admin', 'diskominfo_admin']))
+                            ->dehydrated()
+                            ->default(fn () => auth()->id())
                             ->helperText('Akun yang memiliki dan mengelola profil ini. Klik (+) untuk buat akun baru.'),
 
                         Select::make('media_category_id')
